@@ -1,10 +1,11 @@
 #Indices
-- [Agendamento de iniciação de pagamentos](#Agendamento de iniciação de pagamentos)
-  - [Regras gerais de negócio](#Regras gerais de negócio)
-  - [Modelo com datas explícitas](#Modelo com datas explícitas)
-  - [Modelo com datas implícitas](#Modelo com datas implícitas)
-  - [Revogação de consentimento para pagamentos agendados](#Revogação de consentimento para pagamentos agendados)
-  - [Discussões sobre alterações de premissas de iniciação de pagamentos por conta de multi autorizadores](#Discussões sobre alterações de premissas de iniciação de pagamentos por conta de multi autorizadores)
+- [Agendamento de iniciação de pagamentos](#agendamento-de-iniciação-de-pagamentos)
+  - [Regras gerais de negócio](#regras-gerais-de-negócio)
+  - [Modelo com datas explícitas](#modelo-com-datas-explícitas)
+  - [Modelo com datas implícitas](#modelo-com-datas-implícitas)
+  - [Revogação de consentimento para pagamentos agendados](#revogação-de-consentimento-para-pagamentos-agendados)
+  - [Discussões sobre alterações de premissas de iniciação de pagamentos por conta de multi autorizadores](#discussões-sobre-alterações-de-premissas-de-iniciação-de-pagamentos-por-conta-de-multi-autorizadores)
+  
 
 # Agendamento de iniciação de pagamentos
 
