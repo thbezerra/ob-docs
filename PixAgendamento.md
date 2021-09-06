@@ -8,7 +8,7 @@ Mais adiante são mostradas e discutidas algumas formas de materialização dess
 ## Premissas de negócio
 
 1. Todo o consentimento de pagamento tem o prazo máximo de validade de um ano.
-2. A agenda de pagamento de um dado consentimento deve ser validada pela dententora de conta se está de acordo com o aprovado pelo usuário final em todo evento de pagamento para o consentimento referido.
+2. A agenda de pagamento de um dado consentimento deve ser validada pela detentora de conta se está de acordo com o aprovado pelo usuário final em todo evento de pagamento para o consentimento referido.
 
 ## 1 - Modelo com datas explícitas
 
