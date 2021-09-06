@@ -1,3 +1,11 @@
+#Indices
+- [Agendamento de iniciação de pagamentos](#Agendamento de iniciação de pagamentos)
+  - [Regras gerais de negócio](#Regras gerais de negócio)
+  - [Modelo com datas explícitas](#Modelo com datas explícitas)
+  - [Modelo com datas implícitas](#Modelo com datas implícitas)
+  - [Revogação de consentimento para pagamentos agendados](#Revogação de consentimento para pagamentos agendados)
+  - [Discussões sobre alterações de premissas de iniciação de pagamentos por conta de multi autorizadores](#Discussões sobre alterações de premissas de iniciação de pagamentos por conta de multi autorizadores)
+
 # Agendamento de iniciação de pagamentos
 
 Para possibilitar o agendamento único ou recorrente
@@ -15,11 +23,12 @@ Mais adiante são mostradas e discutidas algumas formas de materialização dess
 3. Todo o pagamento para um consentimento vinculado a uma agenda de pagamento deve ser validado contra a mesma pela detentora de modo a aferir se o momento do pagamento está em conformidade com o aprovado pelo usuário final no momento do consentimento.
 4. Pagamentos mal sucedidos por qualquer motivo não invalidam o consentimento ou impactam os próximos pagamentos.
 
-## 1 - Modelo com datas explícitas
+## Modelo com datas explícitas
 
 Neste modelo a agenda é definida com todas as datas em que serão realizados os pagamentos.  
 
 ### Fragmento do payload de consentimento para pagamentos atual
+
 ```
 {
   "data": {
@@ -79,7 +88,7 @@ O novo campo será incluído tanto no payload de requisição quanto no payload 
 1. Aumento da complexidade em UX para prover formas paginadas de apresentação das datas para o usuário final
 2. Dependendo da estratégia de definição dos períodos de pagamentos, podem acarretar em payloads com quantidade relativamente alta de informação (Ex: 48 datas em períodos semanais) 
 
-## 2 - Modelo com datas implícitas
+## Modelo com datas implícitas
 
 Nesse modelo as datas de pagamentos a serem realizadas são derivadas de uma política de agendamento.
 
@@ -185,9 +194,9 @@ A intenção do usuário final de revogar um consentimento deverá ser expressa 
  2. **HTTP 422** : A solicitação foi bem formada, mas não pôde ser processada devido à lógica de negócios específica da solicitação.  
     **Response** : https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent  
     2.1. Deve ser incluído o valor **OPERATION_NOT_ALLOWED_BY_STATUS** no enum [EnumErrorsCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumErrorsCreateConsent) para representar que a ação atual não é permitida para o status atual do consentimento. Neste caso os campos **"title"** e **"details"** deverão ser preenchidos com a mensagem: **"Operação atual não permitida para o status atual do consentimento alvo."**   
-    2.2  Deve ser incluído o valor **SCHEDULED_PAYMENT_TOO_CLOSE** no enum [EnumErrorsCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumErrorsCreateConsent) para representar que a revogação não foi atendida por que há um pagamento agendado a menos de um dia do momento do pedido de revogação. Neste caso os campos **"title"** e **"details"** deverão ser preenchidos com a mensagem: **"Não foi possível realizar a revogação do consentimento por que há um pagamento agendado para o próximo dia."**
- 3. 
-## Discussões sobre alterações de premissas de iniciação de pagamentos por conta de multi-autorizadores
+    2.2  Deve ser incluído o valor **NEXT_SCHEDULED_PAYMENT_TOO_CLOSE** no enum [EnumErrorsCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumErrorsCreateConsent) para representar que a revogação não foi atendida por que há um pagamento agendado a menos de um dia do momento do pedido de revogação. Neste caso os campos **"title"** e **"details"** deverão ser preenchidos com a mensagem: **"Não foi possível realizar a revogação do consentimento por que há um pagamento agendado para o próximo dia."**
+
+## Discussões sobre alterações de premissas de iniciação de pagamentos por conta de multi autorizadores
 
 Atualmente há três propostas para lidar com a questão de multi-autorizadores de pagamentos oriundas da discussão
 sobre o agendamento de pagamentos.
