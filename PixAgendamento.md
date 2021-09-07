@@ -11,8 +11,7 @@
 
 Para possibilitar o agendamento único ou recorrente
 de pagamentos iniciados pelo Open Banking (OB) seria necessário a inclusão do conceito de "agenda de pagamentos" no consentimento.
-A proposta aqui apresentada tem o canal OB sendo agnóstico ao arranjo do produto final (Pix, TED, TEF, débito em conta) sendo chamado, as suas eventuais interseções com a funcionalidade proposta,
-de modo a ter menos impacto possível no OB em possíveis expansões de funcionalidades destes arranjos futuramente ou regras de negócio deste contexto dos mesmos.
+A proposta aqui apresentada tem o canal OB sendo agnóstico ao arranjo do produto final (Pix, TED, TEF, débito em conta) sendo chamado, suas eventuais interseções com a funcionalidade proposta, de modo a ter menos impacto possível no OB em possíveis expansões de funcionalidades destes arranjos futuramente ou regras de negócio deste contexto dos mesmos.
 Isso acarreta que para produto final o agendamento único ou sucessivo seria totalmente desconhecido se comportando apenas como um pagamento normal.
 
 Mais adiante são mostradas e discutidas algumas formas de materialização dessa **"agenda de pagamentos"**.
