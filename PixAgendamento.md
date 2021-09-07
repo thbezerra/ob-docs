@@ -4,7 +4,7 @@
   - [Modelo com datas explícitas](#modelo-com-datas-explícitas)
   - [Modelo com datas implícitas](#modelo-com-datas-implícitas)
   - [Revogação de consentimento para pagamentos agendados](#revogação-de-consentimento-para-pagamentos-agendados)
-  - [Discussões sobre alterações de premissas de iniciação de pagamentos por conta de multi autorizadores](#discussões-sobre-alterações-de-premissas-de-iniciação-de-pagamentos-por-conta-de-multi-autorizadores)
+  - [Controle de andamento de modificações no consentimento](#controle-de-andamento-de-modificações-no-consentimento)
   
 
 # Agendamento de iniciação de pagamentos
@@ -23,6 +23,8 @@ Mais adiante são mostradas e discutidas algumas formas de materialização dess
 2. A execução de pagamento conforme a agenda fica de responsabilidade da iniciadora como hoje já é feito com pagamentos normais. 
 3. Todo o pagamento para um consentimento vinculado a uma agenda de pagamento deve ser validado contra a mesma pela detentora de modo a aferir se o momento do pagamento está em conformidade com o aprovado pelo usuário final no momento do consentimento.
 4. Pagamentos mal sucedidos por qualquer motivo não invalidam o consentimento ou impactam os próximos pagamentos.
+5. Todo o pagamento mal sucedido pode ser refeito até a data em que o pagamento foi agendado terminar. (Sugestão de periodicidade: A cada 30 minutos)   
+6. O último pagamento agendado, se bem-sucedido, deve marcar o consentimento como consumed
 
 ## Modelo com datas explícitas
 
@@ -197,20 +199,160 @@ A intenção do usuário final de revogar um consentimento deverá ser expressa 
     2.1. Deve ser incluído o valor **OPERATION_NOT_ALLOWED_BY_STATUS** no enum [EnumErrorsCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumErrorsCreateConsent) para representar que a ação atual não é permitida para o status atual do consentimento. Neste caso os campos **"title"** e **"details"** deverão ser preenchidos com a mensagem: **"Operação atual não permitida para o status atual do consentimento alvo."**   
     2.2  Deve ser incluído o valor **NEXT_SCHEDULED_PAYMENT_TOO_CLOSE** no enum [EnumErrorsCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumErrorsCreateConsent) para representar que a revogação não foi atendida por que há um pagamento agendado a menos de um dia do momento do pedido de revogação. Neste caso os campos **"title"** e **"details"** deverão ser preenchidos com a mensagem: **"Não foi possível realizar a revogação do consentimento por que há um pagamento agendado para o próximo dia."**
 
-## Discussões sobre alterações de premissas de iniciação de pagamentos por conta de multi autorizadores
+## Controle de andamento de modificações no consentimento
 
-Atualmente há três propostas para lidar com a questão de multi-autorizadores de pagamentos oriundas da discussão
-sobre o agendamento de pagamentos.
+Por conta da funcionalidade de revogação do consentimento pelo usuário final direto na detentora de conta será necessária
+uma forma da iniciadora se manter a iniciadora ciente de modificações no consentimento.  
+Para atender essa necessidade duas possibilidades técnicas são possíveis: Pooling ou Webhooks para um modelo de push.  
+Dado que a infraestrutura, requisitos de segurança, mecanismo de retentativas e outras questões necessárias para viabilizar webhooks são complexas, esta proposta sugere a solução por pooling agora visando o prazo.  
+Hoje a única forma de obter as informações atuais do consentimento é através de um endpoint usando id do mesmo.
+Desta forma as iniciadoras ou são serão muito cerceadas na quantidade de requisições possíveis, ou darão um overhead computacional grande nas detentoras devido a nível alto de granularidade da busca atual.   
+Essa proposta vem sugerir um novo endpoint para ser usado de pooling que tanto servirá para atender o contexto da revogação como os casos atuais de 
+acompanhamento de mudança de estado do consentimento. Do ponto de vista de autenticação ele usará o mesmo mecanismo de *client credentials* hoje presente no endpoint de busca do pagamento.  
+Os consentimentos retornados por esta api tem que estar filtrados pelo **clientId** conseguido na camada de segurança.  
+A ideia de não criar um endpoint diretamente em /consents com query parameters se deve ao fato de que isso acarretaria a criação de um endpoint de
+listagem para propósito geral com uma complexidade de parâmetros e regras bem mais abrangentes do que dar suporte a monitoramento de atualizações
+dos status dos consentimentos.
 
-1. **Na proposta um nada será alterado e todo fluxo de pagamento que hoje já suportado pelas detentoras de conta que possuem contas com multi-autorizadores será usado.**
-2. **A segunda proposta tem como premissa fazer com que a detentora seja responsável pela execução agendada dos pagamentos.**  
-   **Análise:** Essa proposta oferece um aumento de risco para a detentora que pode, por efeito de algoritmo defeituoso, concluir equivocadamente a realização ou não de pagamentos
-   ficando com toda a responsabilização disso. Fora isso todas as detentoras teriam No modelo onde a iniciadora realiza a execução dos pagamentos a responsabilização e compartilhada. Além disso,
-   em nada isso ajuda na questão de multi-autorizadores que teriam ainda que realizar a autorização de cada pagamento pelos controladores da conta de onde o recurso financeiro será retirado.
-3. **A terceira proposta altera o fluxo de consentimento para suportar os multi-autorizadores antes de mesmo da tentativa de pagamento.**
-   **Análise:** É legitima a questão de que se há diversos controladores de uma conta todas as decisões deveriam ser tomadas em conjunto, contudo, isso cria uma série de fricções de experiência e técnicas.
-   Fricção de experiência estaria em mesmo que o consentimento suportasse um consenso de muitos aprovadores, estes ainda teriam que passar pela mesma rodada de aprovações nos pagamentos, pois o produto final do arranjo suportado
-   por esses tipos de contas ainda será o mesmo nas detentoras.
-   Fricção técnica estaria em como suportar um modelo de autorizações baseado em redirect para um único usuário como é hoje com multiplos aprovadores. Coisas pooling de consentimento ou push notification teriam que ser feitas.
-   Tudo isso para um caso de uso onde nem todas as detentoras possuem.
-   Como mencionado, a proposta de alteração realmente agrega valor, contudo a sua extensão de discussão e execução é bem maior do que o prazo atual que temos para o assunto.     
+
+### Especificação
+
+**GET /payments/v1/consents/{status}/modified/from/{modifiedFrom}/to/{modifiedTo}**
+
+#### Parâmetros ####
+
+1. **modifiedFrom**: **Origem**: path, **tipo**: string(date-time), **obrigatório**, **descrição**: Filtra consentimentos com data e hora de alteração maior ou igual ao informado. Uma string com data e hora conforme especificação RFC-3339, sempre com a utilização de timezone UTC(UTC time format). O intervalo de tempo entre este campo e o campo **modifiedBefore** deve ser no máximo de 30 minutos  
+2. **modifiedTo**: **Origem**: path, **tipo**: string(date-time), **obrigatório**, **descrição**: Filtra consentimentos com data e hora de alteração menor ou igual ao informado. Uma string com data e hora conforme especificação RFC-3339, sempre com a utilização de timezone UTC(UTC time format). O intervalo de tempo entre este campo e o campo **modifiedAfter** deve ser no máximo de 30 minutos
+5. **status**: **Origem**: path, **tipo**: [EnumAuthorisationStatusType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumAuthorisationStatusType), **obrigatório**, **descrição**: Filtra consentimentos com status igual informado.
+6. **page**: **Origem**: query, **tipo**: inteiro, **opcional**, **valor padrão**: 1, **descrição**: Número da página de dados do universo resposta retornado. O valor deve ser um número inteiro positivo de valor mínimo de 1. A primeira página tem o valor 1.  
+7. **limit**: **Origem**: query, **tipo**: inteiro, **opcional**, **valor padrão**: 20, **descrição**: Número máximo de elementos em cada página de dados recebida. Valor deve ser um número inteiro positivo de valor mínimo 5 e máximo de 100.
+8. **Authorization** : **Origem**: header, **tipo**: string, **obrigatório**, **descrição**: Cabeçalho HTTP padrão. Permite que as credenciais sejam fornecidas dependendo do tipo de recurso solicitado
+9. **x-fapi-auth-date** : **Origem**: header, **tipo**: string, **opcional**, **descrição**: Data em que o usuário logou pela última vez com o receptor. Representada de acordo com a RFC7231.Exemplo: Sun, 10 Sep 2017 19:43:31 UTC
+10. **x-fapi-customer-ip-address**: **Origem**: header, **tipo**: string, **opcional**, **descrição**: O endereço IP do usuário se estiver atualmente logado com o receptor.
+11. **x-fapi-interaction-id** : **Origem**: header, **tipo**: string, **opcional**, **descrição**: Um UID RFC4122 usado como um ID de correlação. Se fornecido, o transmissor deve "reproduzir" esse valor no cabeçalho de resposta.
+12. **x-customer-user-agent** : **Origem**: header, **tipo**: string, **opcional**, **descrição**: Indica o user-agent que o usuário utiliza. 
+
+## Respostas ##
+
+ **HTTP 200** : Busca realizada com sucesso.  
+   Campos:
+     1. consents: array de elementos do tipo: [ResponsePaymentConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponsePixPayment), obrigatório, mínimo de 0 elementos
+     2. links: objeto do tipo: [Links](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_LoansBalloonPayment), obrigatório
+     3. meta: objeto do tipo: [Meta](https://openbanking-brasil.github.io/areadesenvolvedor/#schemameta), obrigatório
+   Exemplo:
+   ```
+      {
+   "consents":[
+      {
+         "data":{
+            "consentId":"urn:bancoex:C1DD33123",
+            "creationDateTime":"2021-05-21T08:30:00Z",
+            "expirationDateTime":"2021-05-21T08:30:00Z",
+            "statusUpdateDateTime":"2021-05-21T08:30:00Z",
+            "status":"AWAITING_AUTHORISATION",
+            "loggedUser":{
+               "document":{
+                  "identification":"11111111111",
+                  "rel":"CPF"
+               }
+            },
+            "businessEntity":{
+               "document":{
+                  "identification":"11111111111111",
+                  "rel":"CNPJ"
+               }
+            },
+            "creditor":{
+               "personType":"PESSOA_NATURAL",
+               "cpfCnpj":"58764789000137",
+               "name":"Marco Antonio de Brito"
+            },
+            "payment":{
+               "type":"PIX",
+               "date":"2021-01-01",
+               "currency":"BRL",
+               "amount":"100000.12",
+               "details":{
+                  "localInstrument":"DICT",
+                  "qrCode":"00020104141234567890123426660014BR.GOV.BCB.PIX014466756C616E6F32303139406578616D706C652E636F6D27300012  \nBR.COM.OUTRO011001234567895204000053039865406123.455802BR5915NOMEDORECEBEDOR6008BRASILIA61087007490062  \n530515RP12345678-201950300017BR.GOV.BCB.BRCODE01051.0.080450014BR.GOV.BCB.PIX0123PADRAO.URL.PIX/0123AB  \nCD81390012BR.COM.OUTRO01190123.ABCD.3456.WXYZ6304EB76\n",
+                  "proxy":"12345678901",
+                  "creditorAccount":{
+                     "ispb":"12345678",
+                     "issuer":"1774",
+                     "number":"1234567890",
+                     "accountType":"CACC"
+                  }
+               }
+            },
+            "debtorAccount":{
+               "ispb":"12345678",
+               "issuer":"1774",
+               "number":"1234567890",
+               "accountType":"CACC"
+            }
+         }
+      },
+      {
+         "data":{
+            "consentId":"urn:bancoex:C1DD33908",
+            "creationDateTime":"2021-05-21T08:30:00Z",
+            "expirationDateTime":"2021-05-21T08:30:00Z",
+            "statusUpdateDateTime":"2021-05-21T08:30:00Z",
+            "status":"AWAITING_AUTHORISATION",
+            "loggedUser":{
+               "document":{
+                  "identification":"11111111111",
+                  "rel":"CPF"
+               }
+            },
+            "businessEntity":{
+               "document":{
+                  "identification":"11111111111111",
+                  "rel":"CNPJ"
+               }
+            },
+            "creditor":{
+               "personType":"PESSOA_NATURAL",
+               "cpfCnpj":"58764789000137",
+               "name":"Marco Antonio de Brito"
+            },
+            "payment":{
+               "type":"PIX",
+               "date":"2021-01-01",
+               "currency":"BRL",
+               "amount":"100000.12",
+               "details":{
+                  "localInstrument":"DICT",
+                  "qrCode":"00020104141234567890123426660014BR.GOV.BCB.PIX014466756C616E6F32303139406578616D706C652E636F6D27300012  \nBR.COM.OUTRO011001234567895204000053039865406123.455802BR5915NOMEDORECEBEDOR6008BRASILIA61087007490062  \n530515RP12345678-201950300017BR.GOV.BCB.BRCODE01051.0.080450014BR.GOV.BCB.PIX0123PADRAO.URL.PIX/0123AB  \nCD81390012BR.COM.OUTRO01190123.ABCD.3456.WXYZ6304EB76\n",
+                  "proxy":"12345678901",
+                  "creditorAccount":{
+                     "ispb":"12345678",
+                     "issuer":"1774",
+                     "number":"1234567890",
+                     "accountType":"CACC"
+                  }
+               }
+            },
+            "debtorAccount":{
+               "ispb":"12345678",
+               "issuer":"1774",
+               "number":"1234567890",
+               "accountType":"CACC"
+            }
+         }
+      }
+   ],
+   "links":{
+      "self":"https://api.banco.com.br/open-banking/payments/v1/consents/AWAITING_AUTHORISATION/modified/from/2021-05-21T08:30:00Z/to/2021-05-21T08:35:00Z&page=1",
+      "next":"https://api.banco.com.br/open-banking/payments/v1/consents/AWAITING_AUTHORISATION/modified/from/2021-05-21T08:30:00Z/to/2021-05-21T08:35:00Z&page=2",
+      "last":"https://api.banco.com.br/open-banking/payments/v1/consents/AWAITING_AUTHORISATION/modified/from/2021-05-21T08:30:00Z/to/2021-05-21T08:35:00Z&page=200"
+   },
+   "meta":{
+      "totalRecords":2,
+      "totalPages":200,
+      "requestDateTime":"2021-05-21T08:30:00Z"
+   }
+}
+
+  ```
+
