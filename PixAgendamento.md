@@ -235,10 +235,10 @@ dos status dos consentimentos.
 ## Respostas ##
 
  **HTTP 200** : Busca realizada com sucesso.  
-   Campos:
-     1. consents: array de elementos do tipo: [ResponsePaymentConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponsePixPayment), obrigatório, mínimo de 0 elementos
-     2. links: objeto do tipo: [Links](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_LoansBalloonPayment), obrigatório
-     3. meta: objeto do tipo: [Meta](https://openbanking-brasil.github.io/areadesenvolvedor/#schemameta), obrigatório
+   Campos:  
+     1. consents: array de elementos do tipo: [ResponsePaymentConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponsePixPayment), obrigatório, mínimo de 0 elementos .  
+     2. links: objeto do tipo: [Links](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_LoansBalloonPayment), obrigatório .  
+     3. meta: objeto do tipo: [Meta](https://openbanking-brasil.github.io/areadesenvolvedor/#schemameta), obrigatório.  
    Exemplo:
    ```
       {
