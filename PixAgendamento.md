@@ -23,7 +23,7 @@ Mais adiante são mostradas e discutidas algumas formas de materialização dess
 3. Todo o pagamento para um consentimento vinculado a uma agenda de pagamento deve ser validado contra a mesma pela detentora de modo a aferir se o momento do pagamento está em conformidade com o aprovado pelo usuário final no momento do consentimento.
 4. Pagamentos mal sucedidos por qualquer motivo não invalidam o consentimento ou impactam os próximos pagamentos.
 5. Todo o pagamento mal sucedido pode ser refeito até a data em que o pagamento foi agendado terminar. (Sugestão de periodicidade: A cada 2 horas)
-6. Uma rentativa de pagamento deve ser negada caso haja outro pagamento qualquer para o consentimento alvo no mesmo dia com status diferente de **REJECT**.
+6. Uma rentativa de pagamento deve ser negada caso haja outro pagamento qualquer para o consentimento alvo no mesmo dia com status diferente de **REJECTED**.
 7. O último pagamento agendado, se bem-sucedido, deve marcar o consentimento como consumed
 
 ## Modelo com datas explícitas
@@ -80,7 +80,7 @@ O novo campo será incluído tanto no payload de requisição quanto no payload 
 3. Introdução da mensagem: **"Agendamento inválido."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
 4. Introdução do valor: **"PAYMENT_RETRY_NOT_ALLOWED"** no enumerado [422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent) usando no campo **"code"** já presente no payload de resposta para este tipo de erro.
 5. Introdução da mensagem: **"Retentativa de pagamento não permitida."** no campo **"title"** caso o campo **"code"** tenha o valor definido no **item 4 desta lista**.
-6. Introdução da mensagem: **"Retentativa de pagamento não permitida, pois já existe um pagamento liquidado ou em processo de liquidação."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 4 desta lista**.
+6. Introdução da mensagem: **"Retentativa de pagamento não permitida, pois já existe um pagamento liquidado ou em processo de liquidação no mesmo dia."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 4 desta lista**.
 
 ### Vantagens do modelo:
 
@@ -156,7 +156,7 @@ Esse campo seria um enumerado com os seguintes valores possíveis:
 3. Introdução da mensagem: **"Agendamento inválido."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
 4. Introdução do valor: **"PAYMENT_RETRY_NOT_ALLOWED"** no enumerado [422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent) usando no campo **"code"** já presente no payload de resposta para este tipo de erro.
 5. Introdução da mensagem: **"Retentativa de pagamento não permitida."** no campo **"title"** caso o campo **"code"** tenha o valor definido no **item 4 desta lista**.
-6. Introdução da mensagem: **"Retentativa de pagamento não permitida, pois já existe um pagamento liquidado ou em processo de liquidação."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 4 desta lista**.
+6. Introdução da mensagem: **"Retentativa de pagamento não permitida, pois já existe um pagamento liquidado ou em processo de liquidação no mesmo dia."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 4 desta lista**.
 
 
 ### Vantagens do modelo:
