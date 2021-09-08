@@ -180,7 +180,7 @@ A intenção do usuário final de revogar um consentimento deverá ser expressa 
 
 **PATCH /payments/v1/consents/{consentId}**
 
-**Payload**   
+**Payload**
 
 Exemplo
 
@@ -192,12 +192,12 @@ Exemplo
 }
 ```
 
-Para realizar a alteração deverá ser enviado um objeto como descrito no exemplo acima.    
+Para realizar a alteração deverá ser enviado um objeto como descrito no exemplo acima.
 
 **Campos**
 
-1. **data** : **Tipo**: objeto, **obrigatório**, **descrição**: Objeto contendo as informações de alteração do consentimento.  
-   1. **status**: **Tipo**: [EnumAuthorisationStatusType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumAuthorisationStatusType) , **obrigatório**, **Descrição**: Indica para qual status o consentimento deve progredir. Este campo só deve permitir o valor **"REVOKED"**. 
+1. **data** : **Tipo**: objeto, **obrigatório**, **descrição**: Objeto contendo as informações de alteração do consentimento.
+    1. **status**: **Tipo**: [EnumAuthorisationStatusType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumAuthorisationStatusType) , **obrigatório**, **Descrição**: Indica para qual status o consentimento deve progredir. Este campo só deve permitir o valor **"REVOKED"**.
 
 #### Parâmetros ####
 
@@ -224,13 +224,13 @@ uma forma da iniciadora se manter a iniciadora ciente de modificações no conse
 Para atender essa necessidade duas possibilidades técnicas são possíveis: Pooling ou Webhooks para um modelo de push.  
 Dado que a infraestrutura, requisitos de segurança, mecanismo de retentativas e outras questões necessárias para viabilizar webhooks são complexas, esta proposta sugere a solução por pooling agora visando o prazo.  
 Hoje a única forma de obter as informações atuais do consentimento é através de um endpoint usando id do mesmo.
-Desta forma as iniciadoras ou são serão muito cerceadas na quantidade de requisições possíveis, ou darão um overhead computacional grande nas detentoras devido a nível alto de granularidade da busca atual.   
+Desta forma as iniciadoras ou são serão muito cerceadas na quantidade de requisições possíveis, ou darão um overhead computacional grande nas detentoras devido ao nível de granularidade da busca atual.   
 Essa proposta vem sugerir um novo endpoint para ser usado de pooling que tanto servirá para atender o contexto da revogação como os casos atuais de
 acompanhamento de mudança de estado do consentimento. Do ponto de vista de autenticação ele usará o mesmo mecanismo de *client credentials* hoje presente no endpoint de busca do pagamento.  
 Os consentimentos retornados por esta api tem que estar filtrados pelo **clientId** conseguido na camada de segurança.  
-A ideia de não criar um endpoint diretamente em /consents com query parameters se deve ao fato de que isso acarretaria a criação de um endpoint de
-listagem para propósito geral com uma complexidade de parâmetros e regras bem mais abrangentes do que dar suporte a monitoramento de atualizações
-dos status dos consentimentos.
+A ideia do endpoint em /consents com query parameters não tem o objetivo neste momento de estabelecer uma listagem de proposito geral de consentimentos, pois teríamos que entender quais critérios de filtro deveriam ser adicionados contra as necessidades computacionais de busca e armazenamento de dados das detentoras e prevenção de abusos.
+Neste momento os parâmetros escolhidos visam a atender apenas a conseguir monitorar as mudanças de status dos consentimento ao longo do tempo com uma granularidade maior do que o praticado hoje.
+
 
 
 ### Especificação
@@ -253,11 +253,11 @@ dos status dos consentimentos.
 ## Respostas ##
 
 **HTTP 200** : Busca realizada com sucesso.  
-Campos:  
-1. **consents**: array de elementos do tipo: [ResponsePaymentConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponsePixPayment), obrigatório, mínimo de 0 elementos .  
-2. **links**: objeto do tipo: [Links](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_LoansBalloonPayment), obrigatório .  
+Campos:
+1. **consents**: array de elementos do tipo: [ResponsePaymentConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponsePixPayment), obrigatório, mínimo de 0 elementos .
+2. **links**: objeto do tipo: [Links](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_LoansBalloonPayment), obrigatório .
 3. **meta**: objeto do tipo: [Meta](https://openbanking-brasil.github.io/areadesenvolvedor/#schemameta), obrigatório.  
-Exemplo:
+   Exemplo:
 ```
 {
    "data":[
@@ -357,10 +357,9 @@ Exemplo:
        }
    ],
    "links":{
-      "self":"https://api.banco.com.br/open-banking/payments/v1/consents/AWAITING_AUTHORISATION/modified/from/2021-05-21T08:30:00Z/to/2021-05-21T08:35:00Z&page=1",
-      "next":"https://api.banco.com.br/open-banking/payments/v1/consents/AWAITING_AUTHORISATION/modified/from/2021-05-21T08:30:00Z/to/2021-05-21T08:35:00Z&page=2",
-      "last":"https://api.banco.com.br/open-banking/payments/v1/consents/AWAITING_AUTHORISATION/modified/from/2021-05-21T08:30:00Z/to/2021-05-21T08:35:00Z&page=200"
-   },
+      "self":"https://api.banco.com.br/open-banking/payments/v1/consents?status=AWAITING_AUTHORISATION&status-update-datetime-from=2021-05-21T08:30:00Z&status-update-datetime-to=2021-05-21T08:35:00Z&page=1&page-size=25",
+      "next":"https://api.banco.com.br/open-banking/payments/v1/consents?status=AWAITING_AUTHORISATION&status-update-datetime-from=2021-05-21T08:30:00Z&status-update-datetime-to=2021-05-21T08:35:00Z&page=2&page-size=25",
+      "last":"https://api.banco.com.br/open-banking/payments/v1/consents?status=AWAITING_AUTHORISATION&status-update-datetime-from=2021-05-21T08:30:00Z&status-update-datetime-to=2021-05-21T08:35:00Z&page=200&page-size=25"   },
    "meta":{
       "totalRecords":2,
       "totalPages":200,
