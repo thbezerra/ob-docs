@@ -3,6 +3,7 @@
     - [Regras gerais de negócio](#regras-gerais-de-negócio)
     - [Modelo com datas explícitas](#modelo-com-datas-explícitas)
     - [Modelo com datas implícitas](#modelo-com-datas-implícitas)
+    - [Alterações no endpoint de criação de pagamentos](#alterações-no-endpoint-de-criação-de-pagamentos)
     - [Revogação de consentimento para pagamentos agendados](#revogação-de-consentimento-para-pagamentos-agendados)
     - [Controle de andamento de modificações no consentimento](#controle-de-andamento-de-modificações-no-consentimento)
 
@@ -75,12 +76,9 @@ O novo campo será incluído tanto no payload de requisição quanto no payload 
 ### Erros de resposta
 
 **HTTP 422 (Schema: https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)**
-1. Introdução do valor: **INVALID_SCHEDULE** no enumerado [422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent) usando no campo **"code"** já presente no payload de resposta para este tipo de erro.
+1. Introdução do valor: **INVALID_SCHEDULE** no enumerado [422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent) usado no campo **"code"** já presente no payload de resposta para este tipo de erro.
 2. Introdução da mensagem: **"Agendamento inválido."** no campo **"title"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
 3. Introdução da mensagem: **"Agendamento inválido."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
-4. Introdução do valor: **"PAYMENT_RETRY_NOT_ALLOWED"** no enumerado [422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent) usando no campo **"code"** já presente no payload de resposta para este tipo de erro.
-5. Introdução da mensagem: **"Retentativa de pagamento não permitida."** no campo **"title"** caso o campo **"code"** tenha o valor definido no **item 4 desta lista**.
-6. Introdução da mensagem: **"Retentativa de pagamento não permitida, pois já existe um pagamento liquidado ou em processo de liquidação no mesmo dia."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 4 desta lista**.
 
 ### Vantagens do modelo:
 
@@ -154,9 +152,6 @@ Esse campo seria um enumerado com os seguintes valores possíveis:
 1. Introdução do valor: **INVALID_SCHEDULE** no enumerado [422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent) usado no campo **"code"** já presente no payload de resposta para este tipo de erro.
 2. Introdução da mensagem: **"Agendamento inválido."** no campo **"title"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
 3. Introdução da mensagem: **"Agendamento inválido."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
-4. Introdução do valor: **"PAYMENT_RETRY_NOT_ALLOWED"** no enumerado [422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent) usando no campo **"code"** já presente no payload de resposta para este tipo de erro.
-5. Introdução da mensagem: **"Retentativa de pagamento não permitida."** no campo **"title"** caso o campo **"code"** tenha o valor definido no **item 4 desta lista**.
-6. Introdução da mensagem: **"Retentativa de pagamento não permitida, pois já existe um pagamento liquidado ou em processo de liquidação no mesmo dia."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 4 desta lista**.
 
 
 ### Vantagens do modelo:
@@ -169,6 +164,15 @@ Esse campo seria um enumerado com os seguintes valores possíveis:
 
 1. Como a detentora tem que validar se o pagamento recebido está em sinergia com agendamento consentido seria necessário a detentora concluir os períodos de pagamento da mesma forma que a iniciadora idealizou.
    Isso acarretaria definições sobre dias úteis vs dias corridos, tratamento de anos bissextos, regionalidade de feriados e etc que pode se tornar um tópico bem grande para configuração.
+
+## Alterações no endpoint de criação de pagamentos
+
+### Respostas ###
+**HTTP 422 (Schema: https://openbanking-brasil.github.io/areadesenvolvedor/#schema422responseerrorcreatepixpayment)**
+1. Introdução do valor: **"PAYMENT_RETRY_NOT_ALLOWED"** no enumerado [EnumErrorsCreatePayment](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumErrorsCreatePayment) usado no campo **"code"** já presente no payload de resposta para este tipo de erro.
+2. Introdução da mensagem: **"Retentativa de pagamento não permitida."** no campo **"title"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
+3. Introdução da mensagem: **"Retentativa de pagamento não permitida, pois já existe um pagamento liquidado ou em processo de liquidação no mesmo dia."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
+
 
 ## Revogação de consentimento para pagamentos agendados
 
