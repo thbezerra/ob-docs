@@ -178,7 +178,7 @@ Além disso, o token de acesso vinculado ao consentimento alvo também deve ser 
 
 A intenção do usuário final de revogar um consentimento deverá ser expressa através de um novo endpoint na api de pagamentos no formato descrito abaixo:
 
-**POST /payments/v1/consents/{consentId}/revoke**
+**DELETE /payments/v1/consents/{consentId}**
 
 #### Parâmetros ####
 
