@@ -1,37 +1,55 @@
 # Indices
 - [Agendamento de iniciação de pagamentos](#agendamento-de-iniciação-de-pagamentos)
     - [Regras gerais de negócio](#regras-gerais-de-negócio)
-    - [Modelo com datas explícitas](#modelo-com-datas-explícitas)
-    - [Modelo com datas implícitas](#modelo-com-datas-implícitas)
+    - [Políticas de agendamento](#políticas-de-agendamento)
+    - [Política de agendamento de pagamento único](#política-de-agendamento-de-pagamento-único)
+    - [Política de agendamento de pagamento recorrente com frequência fixa](#política-de-agendamento-de-pagamento-recorrente-com-frequência-fixa)
+    - [Política de agendamento de pagamento recorrente por repetição](#política-de-agendamento-de-pagamento-recorrente-por-repetição)
+    - [Política de agendamento recorrente por configuração customizada](#política-de-agendamento-recorrente-por-configuração-customizada)
     - [Alterações no endpoint de criação de pagamentos](#alterações-no-endpoint-de-criação-de-pagamentos)
-    - [Revogação de consentimento para pagamentos agendados](#revogação-de-consentimento-para-pagamentos-agendados)
     - [Controle de andamento de modificações no consentimento](#controle-de-andamento-de-modificações-no-consentimento)
 
 
 # Agendamento de iniciação de pagamentos
 
 Para possibilitar o agendamento único ou recorrente
-de pagamentos iniciados pelo Open Banking (OB) seria necessário a inclusão do conceito de "agenda de pagamentos" no consentimento.
+de pagamentos iniciados pelo Open Banking (OB) seria necessário a inclusão do conceito de "política de agendamento" no consentimento.
 A proposta aqui apresentada tem o canal OB sendo agnóstico ao arranjo do produto final (Pix, TED, TEF, débito em conta) sendo chamado, suas eventuais interseções com a funcionalidade proposta, de modo a ter menos impacto possível no OB em possíveis expansões de funcionalidades destes arranjos futuramente ou regras de negócio deste contexto dos mesmos.
 Isso acarreta que para produto final o agendamento único ou sucessivo seria totalmente desconhecido se comportando apenas como um pagamento normal.
 
-Mais adiante são mostradas e discutidas algumas formas de materialização dessa **"agenda de pagamentos"**.
+Mais adiante são mostradas e discutidas algumas formas de materialização dessa **"política de agendamento"**.
 
 ## Regras gerais de negócio
 
-1. Todo o consentimento de pagamento tem o prazo máximo de validade de um ano, pois seria limite máximo de datas na agenda de pagamentos.
+1. Todo o consentimento de pagamentos agendados ou recorrentes tem o prazo máximo de validade decorrente da política de agendamento associada.
 2. A execução de pagamento conforme a agenda fica de responsabilidade da iniciadora como hoje já é feito com pagamentos normais.
-3. Todo o pagamento para um consentimento vinculado a uma agenda de pagamento deve ser validado contra a mesma pela detentora de modo a aferir se o momento do pagamento está em conformidade com o aprovado pelo usuário final no momento do consentimento.
+3. Todo pagamento para um consentimento vinculado a uma agenda de pagamento deve ser validado contra a mesma pela detentora de modo a aferir se o momento do pagamento está em conformidade com o aprovado pelo usuário final no momento do consentimento.
 4. Pagamentos mal sucedidos por qualquer motivo não invalidam o consentimento ou impactam os próximos pagamentos.
 5. Todo o pagamento mal sucedido pode ser refeito até a data em que o pagamento foi agendado terminar. (Sugestão de periodicidade: A cada 2 horas)
 6. Uma rentativa de pagamento deve ser negada caso haja outro pagamento qualquer para o consentimento alvo no mesmo dia com status diferente de **REJECTED**.
-7. O último pagamento agendado, se bem-sucedido, deve marcar o consentimento como consumed
+7. O último pagamento agendado, se bem-sucedido, deve marcar o consentimento como **consumed**.
+8. Todo consentimento de pagamentos agendados/recorrentes deverá ser marcado como **consumed** caso a sua data de expiração seja ultrapassada.
 
-## Modelo com datas explícitas
+## Políticas de agendamento
 
-Neste modelo a agenda é definida com todas as datas em que serão realizados os pagamentos.
+Refletindo as discussões no grupo de trabalho sobre o tema de agendamento e recorrência de pagamentos de valor fixo,  
+fora entendido que um modelo de dados que permitisse a conclusão de datas de pagamento a partir de parâmetros e não de datas explícitas seria o  
+mais adequado para maioria dos casos de uso. Além disso, verificou-se a necessidade que esses parâmetros deveriam expor de forma inequívoca, tanto para as iniciadoras quanto para as detentoras,  
+como a recorrência de pagamentos deveria interpretada.
+Com isso os modelos propostos foram revistos para estarem aderentes ao exposto além de permitir um maior nível de escolha pelos membros do grupo de trabalho  
+quais *features* poderão ser adicionadas.
 
-### Fragmento do payload de consentimento para pagamentos atual
+### Especificações
+
+O campo **schedule** deverá ser adicionado ao payload de consentimento no objeto payment que hoje já compõe o mesmo.
+Ele será um objeto onde a sua estrutura será descrita posteriormente neste documento.
+Este campo será mutuamente exclusivo contra o campo **date** hoje já presente no objeto payment.
+O campo **date** só será usado para pagamentos normais, ou seja, não agendados/recorrentes.
+Caso os dois campos estejam presentes simultaneamente no payload da requisição, a detentora deve devolver uma **resposta HTTP 400**.
+
+Observe o exemplo abaixo
+
+### Exemplo de fragmento do payload de consentimento para pagamentos atual
 
 ```
 {
@@ -46,72 +64,7 @@ Neste modelo a agenda é definida com todas as datas em que serão realizados os
 }
 
 ```
-### Fragmento do payload de consentimento para pagamentos agendados com o modelo de datas explícitas
-
-```{
-   "data":{
-      "payment":{
-         "type":"PIX",
-         "currency":"BRL",
-         "amount":"100000.12",
-         "schedule":[
-            "2021-01-01",
-            "2021-02-19",
-            "2021-06-25",
-            "2021-12-31"
-         ]
-      }
-   }
-}
-```
-
-Nesse modelo é introduzido o campo **"schedule"** sendo um array de datas sem repetição com no máximo 48 elementos (O número 48 de elementos vem da possibilidade de pagamentos semanais durante um ano).
-Esse campo seria **mutuamente exclusivo** contra o campo **"date"** já presente na estrutura **"payment"** como mostrado no exemplo.  
-Para facilitar o entendimento dos usuários finais, a **detentora** deverá armazenar e devolver na resposta essas datas de forma ordenada da menor para a maior.  
-A **menor** data presente no array **"schedule"** deve ser uma data futura.  
-A **maior** data presente no array **"schedule"** deve ser no máximo um ano no futuro a partir do dia do consentimento.  
-O novo campo será incluído tanto no payload de requisição quanto no payload de resposta bem sucedida do endpoint de criação de consentimento para pagamentos (Respectivamente: https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_CreatePaymentConsent e https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponsePaymentConsent)
-
-
-### Erros de resposta
-
-**HTTP 422 (Schema: https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)**
-1. Introdução do valor: **INVALID_SCHEDULE** no enumerado [422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent) usado no campo **"code"** já presente no payload de resposta para este tipo de erro.
-2. Introdução da mensagem: **"Agendamento inválido."** no campo **"title"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
-3. Introdução da mensagem: **"Agendamento inválido."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
-
-### Vantagens do modelo:
-
-1. Flexibilidade total na definição nos períodos de pagamentos pelas iniciadoras
-2. Toda a lógica de referente a dias úteis e corridos sobre os períodos de pagamentos definidos ficam a cargo das iniciadoras, portanto, concentradas em único player.
-3. Clareza para as detentoras das datas a serem validadas nos pagamentos
-4. Clareza para os usuários finais de quando serão executados seus pagamentos
-
-### Desvantagens do modelo:
-
-1. Aumento da complexidade em UX para prover formas paginadas de apresentação das datas para o usuário final
-2. Dependendo da estratégia de definição dos períodos de pagamentos, podem acarretar em payloads com quantidade relativamente alta de informação (Ex: 48 datas em períodos semanais)
-
-## Modelo com datas implícitas
-
-Nesse modelo as datas de pagamentos a serem realizadas são derivadas de uma política de agendamento.
-
-### Fragmento do payload de consentimento para pagamentos atual
-```
-{
-  "data": {
-    "payment": {
-      "type": "PIX",
-      "date": "2021-01-01",
-      "currency": "BRL",
-      "amount": "100000.12"
-    }
-  }
-}
-
-```
-### Fragmento do payload de consentimento para pagamentos agendados com o modelo de datas implícitas
-
+### Exemplo de fragmento do payload de consentimento para pagamentos agendados/recorrentes
 
 ```{
    "data":{
@@ -120,50 +73,189 @@ Nesse modelo as datas de pagamentos a serem realizadas são derivadas de uma pol
          "currency":"BRL",
          "amount":"100000.12",
          "schedule":{
-            "first_date":"2021-01-01",
-            "last_date":"2021-12-31",
-            "recurring_type":"MONTHLY"
+            "single":{
+               "date":"2035-01-01"
+            }
          }
       }
    }
 }
 ```
 
-Nesse modelo é introduzido o campo **"schedule"** sendo um objeto que contém a definição de uma **política de agendamento** dos pagamentos.  
-Esse campo seria mutuamente exclusivo contra o campo **"date"** já presente na estrutura **"payment"** como mostrado no exemplo.
+## Tipos de políticas de agendamento 
 
-O campo obrigatório **"first_date"** representa o início do período de pagamentos e deve ser uma data futura de no máximo um ano de diferença da data atual.
+Quatro tipos de políticas de agendamento foram definidas com base nas discussões do grupo de trabalho:
 
-O campo obrigatório **"last_date** representa o fim do período de pagamentos devendo ser maior ou igual ao definido no campo **"first_date"** e no máximo com um ano de diferença da data atual.
+1. Pagamento único
+2. Pagamento recorrente com frequência fixa
+3. Pagamento recorrente por repetição
+4. Pagamento recorrente por configuração *customizada*
 
-O campo obrigatório **"recurring_type"** representa a recorrência dos pagamentos que serão realizados no período especificado entre o **"first_date"** e o **"last_date"**.
-Esse campo seria um enumerado com os seguintes valores possíveis:
+Todas as políticas de agendamento são mutuamente exclusivas entre si, ou seja, não podem coabitar a definição de um mesmo payload de consentimento para pagamentos simultaneamente.  
+Caso isso ocorra a detentora deve retornar a **resposta HTTP 400** para a iniciadora.
 
-1. **SINGLE** - Define um pagamento agendado sem recorrência. Para esse valor os campos **"first_date"** e **"last_date"** devem ser iguais.
-3. **WEEK** - Define que os pagamentos serão feitos a cada 7 dias a partir do **"first_date"** até **"last_date"**.
-4. **FORTNIGHT** - Define que os pagamentos serão feitos a cada 15 dias a partir do **"first_date"** até **"last_date"**.
-5. **MONTH** - Define que os pagamentos serão feitos a cada 30 dias a partir do **"first_date"** até **"last_date"**.
-6. **QUARTER** - Define que os pagamentos serão feitos a cada 90 dias a partir do **"first_date"** até **"last_date"**.
-7. **HALF_YEAR** - Define que os pagamentos serão feitos a cada 180 dias a partir do **"first_date"** até **"last_date"**.
+### Política de agendamento de pagamento único ###
+
+Essa política determina o agendamento de um pagamento único numa data futura.
+O consentimento neste caso deve ter o campo **expirationDateTime** definido para a última hora, minuto e segundo do dia agendado.   
+Ex: dia do agendamento = "2021-01-01" então o **expirationDateTime** seria "2021-01-01T23:59:59Z".   
+
+#### Especificação ####
+
+```
+{
+   "data":{
+      "payment":{
+         "type":"PIX",
+         "currency":"BRL",
+         "amount":"100000.12",
+         "schedule":{
+            "single":{
+               "date":"2035-01-01"
+            }
+         }
+      }
+   }
+}
+```
+
+A política de agendamento de pagamento único é introduzida pelo campo de nome **single** no objeto do campo **schedule** conforme mostrado no exemplo acima.  
+Ela define a seguinte estrutura:
+
+**Campos**  
+  
+1. **date** : **tipo**: string(date), **obrigatório**, **descrição**: Data do agendamento do pagamento. Essa data deve ser futura em relação ao dia do consentimento. 
+
+Para o contexto de "UX", a intenção dessa política pode ser expressa para usuário final da seguinte forma: "Pagamento agendado para o dia {date}"
+
+### Política de agendamento de pagamento recorrente com frequência fixa ###
+
+```
+{
+   "data":{
+      "payment":{
+         "type":"PIX",
+         "currency":"BRL",
+         "amount":"100000.12",
+         "schedule":{
+            "fixed":{
+               "delay":"2022-08-10",
+               "frequency":2,
+               "count":3
+            }
+         }
+      }
+   }
+}
+```
+
+Essa política determina **uma quantidade de pagamentos a ser realizada distribuída em uma frequência de datas futuras determinadas em dias corridos a partir de uma data inicial**.  
+Esta política pode conter um campo de *delay* para determinar a partir de quando no futuro a recorrência iniciará.  
+Caso não definido, **o dia atual do consentimento será assumido**.    
+O consentimento neste caso deve ter o campo **expirationDateTime** definido para última hora, minuto e segundo da última recorrência  
+pela fórmula: **delay + dias_corridos(count * frequency)** .    
+Com exemplo de payload mostrado acima seria: 2022-08-10 + 2 * 3 = "2022-08-16T23:59:59Z"  
+No exemplo teremos pagamentos em: 2022-08-12, 2022-08-14 e 2022-08-16.   
+
+A política de agendamento de pagamento recorrente com frequência fixa é introduzida pelo campo de nome **fixed** no objeto do campo **schedule** conforme mostrado no exemplo acima.  
+Ela define a seguinte estrutura:
+
+**Campos**
+  1. **delay** : **tipo**: string(date), **opcional**, **valor padrão**: data atual do consentimento, **descrição**: Data de onde irá começar a contar a recorrência de pagamentos. Essa data deve ser futura ou igual ao dia do consentimento em questão.
+  2. **frequency**: **tipo**: inteiro, **obrigatório**, **valor mínimo: 2**, **valor máximo**: 365, **descrição**: Frequência em dias corridos da recorrência de pagamentos.
+  3. **count**: **tipo**: inteiro, **obrigatório**, **valor mínimo: 2**, **valor máximo**: 200, **descrição**: Quantidade de pagamentos a ser realizada a partir da data inicial de recorrência.
+
+Para o contexto de "UX", a intenção dessa política pode ser expressa para usuário final da seguinte forma: "Pagamento recorrente agendado a cada {frequency} dias a partir da data {delay}"
+
+
+### Política de agendamento de pagamento recorrente por repetição ###
+
+
+```
+{
+   "data":{
+      "payment":{
+         "type":"PIX",
+         "currency":"BRL",
+         "amount":"100000.12",
+         "schedule":{
+            "iteration":{
+               "delay":"2022-08-19",
+               "day_of_month":18,
+               "count":3
+            }
+         }
+      }
+   }
+}
+```
+
+Essa política define **uma quantidade específica de pagamentos a serem feitos distribuídos no tempo sempre no mesmo dia a cada mês a partir de uma data inicial.**  
+Esta política pode conter um campo de *delay* para determinar a partir de quando no futuro a recorrência iniciará.  
+Caso não definido, **o dia posterior ao dia atual do consentimento será assumido** com intuito de não acontecer pagamento no mesmo dia do consentimento.  
+O consentimento neste caso deve ter o campo **expirationDateTime** definido para última hora, minuto e segundo da última recorrência  
+pela fórmula: **proximo_dia_do_mes_a_partir(delay, day_of_month) + meses(count)** .       
+Com exemplo de payload mostrado acima seria: 
+data := proximo_dia_do_mes_a_partir(delay, day_of_month) = 2022-09-18  
+data + 3meses = "2022-11-18T23:59:59Z"  
+No exemplo teremos pagamentos em: 2022-09-18, 2022-10-18 e 2022-11-18.  
+**Em caso da combinação de day_of_month de valor 29 com períodos passando no mês de fevereiro o dia 28 deve ser assumido como data de pagamento em anos não bissextos.**
+
+A política de agendamento de pagamento recorrente por repetição é introduzida pelo campo de nome **iteration** no objeto do campo **schedule** conforme mostrado no exemplo acima.  
+Ela define a seguinte estrutura:
+
+**Campos**
+1. **delay** : **tipo**: string(date), **opcional**, **valor padrão**: data posterior corrida a data atual do consentimento, **descrição**: Data de onde irá começar a contar a recorrência de pagamentos. Essa data deve ser futura ao dia do consentimento em questão.
+2. **day_of_month**: **tipo**: inteiro, **obrigatório**, **valor mínimo: 1**, **valor máximo**: 31, **descrição**: Dia do mês em que cada pagamento irá ocorrer. 
+3. **count**: **tipo**: inteiro, **obrigatório**, **valor mínimo: 2**, **valor máximo**: 200, **descrição**: Quantidade de pagamentos a ser realizada a partir da data inicial de recorrência.
+
+
+Para o contexto de "UX", a intenção dessa política pode ser expressa para usuário final da seguinte forma: "Pagamento recorrente agendado para todo dia {day_of_month} a partir da data {delay}"
+
+### Política de agendamento recorrente por configuração customizada ###
+
+```
+{
+   "data":{
+      "payment":{
+         "type":"PIX",
+         "currency":"BRL",
+         "amount":"100000.12",
+         "schedule":{
+            "custom":{
+               "dates":[
+                  "2022-08-10",
+                  "2022-09-18",
+                  "2022-10-26"
+               ]
+            }
+         }
+      }
+   }
+}
+```
+
+Essa política **define que seja descrita de forma explicita cada momento no futuro quando os pagamentos serão feitos.** 
+Todas as datas informadas devem únicas e futuras. A quantidade máxima de datas deve ser 50 e a minima 2.
+A detentora deve ordenar essas datas da menor para a maior antes de armazenar e devolver a iniciadora o consentimento criado.
+O consentimento neste caso deve ter o campo **expirationDateTime** definido para última hora, minuto e segundo da última recorrência  
+definido pela maior data informada.  
+No exemplo a maior data informada seria 2022-10-26 então o **expirationDateTime** deste consentimento seria "2022-10-26T23:59:59Z"  
+
+A política de agendamento de pagamento recorrente por configuração *customizada* é introduzida pelo campo de nome **custom** no objeto do campo **schedule** conforme mostrado no exemplo acima.  
+Ela define a seguinte estrutura:
+
+**Campos**
+1. **dates** : **tipo**: array de string(date), **obrigatório**, **quantidade minina de elementos**: 2, **quantidade máxima de elementos**: 50, **descrição**: Lista de datas de recorrência de pagamentos. Todas as datas presentes no array devem únicas e futuras.
+
+Para o contexto de "UX", a intenção dessa política pode ser expressa para usuário final da seguinte forma: "Pagamento recorrente agendado para os dias {dates}"
 
 ### Erros de resposta
 
 **HTTP 422 (Schema: https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)**
-1. Introdução do valor: **INVALID_SCHEDULE** no enumerado [422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent) usado no campo **"code"** já presente no payload de resposta para este tipo de erro.
+1. Introdução do valor: **INVALID_SCHEDULE** no enumerado [422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent) usado no campo **"code"** já presente no payload de resposta para quando qualquer validação de negócio falhar.
 2. Introdução da mensagem: **"Agendamento inválido."** no campo **"title"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
 3. Introdução da mensagem: **"Agendamento inválido."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
-
-
-### Vantagens do modelo:
-
-1. Não há aumento de complexidade significativo em UX
-2. O payloads dos consentimentos não teriam aumento de tamanho significativo
-3. Para o usuário final teria menos *"overhead"* cognitivo no momento da aprovação do consentimento
-
-### Desvantagens do modelo:
-
-1. Como a detentora tem que validar se o pagamento recebido está em sinergia com agendamento consentido seria necessário a detentora concluir os períodos de pagamento da mesma forma que a iniciadora idealizou.
-   Isso acarretaria definições sobre dias úteis vs dias corridos, tratamento de anos bissextos, regionalidade de feriados e etc que pode se tornar um tópico bem grande para configuração.
 
 ## Alterações no endpoint de criação de pagamentos
 
