@@ -74,7 +74,7 @@ o rejectionReason **CANCELED_BY_USER** .
 
 ## Cancelamento de pagamento na iniciadora
 Nesta modalidade o usuário irá solicitar o cancelamento do pagamento agendado através da iniciadora.  
-A detentora deverá só permitir essa operação caso o pagamento esteja no status: **SASC** . Em caso de violação dessa regra a resposta 422 deverá ser devolvida com 
+A detentora deverá só permitir essa operação caso o pagamento esteja nos status: **PDNG**, **PART**, **SASP** ou **SASC**,  . Em caso de violação dessa regra a resposta 422 deverá ser devolvida com 
 o campo **code** com o valor **OPERATION_NOT_ALLOWED_BY_STATUS**.  
 Como não há uma regra uniforme definida no arranjo do PIX de limite de tempo para o cancelamento fica a cargo
 de cada instituição verificar as suas políticas. Caso esse limite de tempo seja violado a detentora deverá negar o pedido de cancelamento
