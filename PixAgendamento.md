@@ -138,8 +138,8 @@ com o campo **code** com o valor **INCONSISTENT_PAYMENT_DATE** .
 ```
 {
    "localInstrument":"DICT",
-   "date":"2022-12-10",
    "payment":{
+      "date":"2022-12-10",
       "amount":"100000.12",
       "currency":"BRL"
    },
