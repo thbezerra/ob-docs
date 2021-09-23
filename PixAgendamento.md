@@ -115,7 +115,7 @@ Para realizar a alteração deverá ser enviado um objeto como descrito no exemp
 
 #### Respostas ####
 
-1. **HTTP 200** : Indica que o cancelamento do consentimento alvo foi realizada com sucesso.  
+1. **HTTP 200** : Indica que o cancelamento do pagamento alvo foi realizada com sucesso.  
    **Response** : https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponsePixPayment .
 2. **HTTP 422** : A solicitação foi bem formada, mas não pôde ser processada devido à lógica de negócios específica da solicitação.  
    **Response** : https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreatePixPayment  
