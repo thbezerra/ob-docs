@@ -1,0 +1,19 @@
+@startuml
+actor       "Usuário"       as usuario
+participant Iniciadora      as iniciadora
+participant "Detentora OB"  as detentora
+participant PIX             as pix
+
+usuario -> iniciadora: 1. Solicitar revogação do consentimento para pagamento agendado
+iniciadora -> detentora: 1.1 Criar a solicitação de revogação de consentimento
+detentora -> pix: 1.1.1 Cancelar agendamento PIX
+detentora <-- pix
+
+detentora -> detentora: 1.1.2 Marcar o pagamento como rejeitado
+detentora -> detentora: 1.1.3 Marcar o consentimento como revogado
+detentora -> detentora: 1.1.4 Cancelar os tokens de acesso vinculados ao consentimento
+detentora -> detentora: 1.1.4 Armazenar a revogação do consentimento como completada
+
+iniciadora <-- detentora
+usuario <-- iniciadora
+@enduml
