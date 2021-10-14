@@ -3,7 +3,7 @@
 Toda a api da iniciação de pagamentos foi construída para ser o mais flexível do ponto de vista
 de implementação de back-end, suportando tanto fluxos síncronos como fluxos assícronos se valendo de máquinas de estado vinculada a cada recurso sendo criado.  
 Isso acarreta que requisições não devem ser encaradas como determinísticas, mas sim interpretativas do ponto de vista de respostas da api.
-Ao analisar alguns cenários da sensidea e como motor de certificação funcional está sendo contruído, me deu a impressão que a abordagem determinística foi adotada o que faria
+Ao analisar alguns cenários da sensidea e como motor de certificação funcional está sendo construído, me deu a impressão que a abordagem determinística foi adotada o que faria
 com as instituições fossem obrigadas a escrever as suas jornadas de back-end de uma forma única contrariando a flexibilidade da especificação.  
 Observem abaixo dois exemplos dentre os diversos fluxos possíveis de implementação de backend para o endpoint de pagamentos coesos com a nossa especificação.  
 
