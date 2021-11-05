@@ -132,7 +132,7 @@ deverá retornar um erro de negócio com o código HTTP 422 e no payload de erro
 2. O consentimento de pagamento agendado só pode ser revogado até 1 dia antes da execução do pagamento, caso contrário o endpoint deverá retornar
 um erro de negócio com o código HTTP 422 e no payload de erro o código **REVOCATION_TIME_LIMIT_EXCEEDED**.
 3. O consentimento de pagamento agendado só pode ser revogado se estiver no status **[SCHEDULED](#ciclo-de-vida-do-consentimento)**, caso contrário o endpoint deverá retornar um erro de negócio com o código HTTP 422 e no payload do erro o código **OPERATION_NOT_ALLOWED_BY_STATUS**
-4. Só pode haver uma requisição de agendamento em processamento ou completada para um dado consentimento de pagamento agendado, logo caso haja a tentativa de solicitar mais de uma revogação fora da regra descrita o sistema deverá retornar um erro de negócio com o código HTTP 422 e no payload de erro o código **REVOCATION_ALREADY_IN_PROCESS**. Deve-se atentar ao mecanismo de [idempotência](https://openbanking-brasil.github.io/areadesenvolvedor/#idempotencia) de chamadas antes aferir essa regra. 
+4. Só pode haver uma requisição de revogação em processamento ou completada para um dado consentimento de pagamento agendado, logo caso haja a tentativa de solicitar mais de uma revogação fora da regra descrita o sistema deverá retornar um erro de negócio com o código HTTP 422 e no payload de erro o código **REVOCATION_ALREADY_IN_PROCESS**. Deve-se atentar ao mecanismo de [idempotência](https://openbanking-brasil.github.io/areadesenvolvedor/#idempotencia) de chamadas antes aferir essa regra. 
 
 ### Autenticação
 
