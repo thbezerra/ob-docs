@@ -7,11 +7,12 @@
 - [Retentativas de liquidação de pagamentos](#retentativas-de-liquidação-de-pagamentos) 
 - [Revogação de consentimento para pagamentos agendados](#revogação-de-consentimento-para-pagamentos-agendados)
   - [Endpoint de revogação de consentimento](#endpoint-de-revogação-de-consentimento)
-    - [Fluxo de revogação realizado pelo usuário na iniciadora](#fluxo-de-revogação-realizado-pelo-usuário-na-iniciadora)
-    - [Fluxo de revogação realizado pela iniciadora](#fluxo-de-revogação-realizado-pela-iniciadora)
-    - [Fluxo de revogação pelo usuário na detentora na área de gestão do Open Banking](#fluxo-de-revogação-pelo-usuário-na-detentora-na-área-de-gestão-do-Open-Banking)
-    - [Fluxo de revogação pela detentora](#fluxo-de-revogação-pela-detentora)
-    - [Fluxo de cancelamento de agendamento pelo usuário na detentora na área de arranjo PIX](#fluxo-de-cancelamento-de-agendamento-pelo-usuário-na-detentora-na-área-de-arranjo-PIX)
+  - [Ciclo de vida da revogação do consentimento](#ciclo-de-vida-da-revogação-do-consentimento)
+  - [Fluxo de revogação realizado pelo usuário na iniciadora](#fluxo-de-revogação-realizado-pelo-usuário-na-iniciadora)
+  - [Fluxo de revogação realizado pela iniciadora](#fluxo-de-revogação-realizado-pela-iniciadora)
+  - [Fluxo de revogação pelo usuário na detentora na área de gestão do Open Banking](#fluxo-de-revogação-pelo-usuário-na-detentora-na-área-de-gestão-do-Open-Banking)
+  - [Fluxo de revogação pela detentora](#fluxo-de-revogação-pela-detentora)
+  - [Fluxo de cancelamento de agendamento pelo usuário na detentora na área de arranjo PIX](#fluxo-de-cancelamento-de-agendamento-pelo-usuário-na-detentora-na-área-de-arranjo-PIX)
   - [Endpoint de busca de revogação](#endpoint-de-busca-de-revogação)
 - [Alterações no endpoint de busca de dados do consentimento](#alterações-no-endpoint-de-busca-de-dados-do-consentimento)
 - [Alterações no endpoint de criação de pagamentos para suportar o agendamento](#alterações-no-endpoint-de-criação-de-pagamentos-para-suportar-o-agendamento)
@@ -242,6 +243,21 @@ com exceção do campo code que neste caso terá um tipo enumerado novo cujos va
 2. code: **REVOCATION_TIME_LIMIT_EXCEEDED**, title: Prazo limite para revogação excedido, details: Prazo limite para revogação excedido
 3. code: **OPERATION_NOT_ALLOWED_BY_STATUS**, title: Operação não suportada, details: Operação não suportada para o status atual do consentimento
 4. code: **REVOCATION_ALREADY_IN_PROCESS**, title: Revogação já em processamento, details: Revogação já em andamento.  
+
+### Ciclo de vida da revogação do consentimento
+
+Para suportar assincronismo e contas com múltiplas alçadas fora adicionado um ciclo de vida da revogação
+que vai do momento da sua criação até o momento da mudança de estado do consentimento para **revogado**.
+O campo **status** da revogação é um enumerado com as seguintes possibilidades de valor.
+
+1. **PENDING** : Inidica que a revogação está pendente de validações de negócio em andamento.
+2. **AWAITING_AUTHORIZATION** : Indica que a revogação está pendente de autorização pelos diversos proprietários da conta alvo.
+3. **PROCESSING** : Indica que a revogação está processamento
+4. **REJECTED** : Indica que a revogação foi rejeitada por erro de negócio ou por um dos proprietários da conta
+5. **COMPLETED** : Indica que a revogação foi executada com sucesso e, portanto, o consentimnto alcançou também o status **REVOKED**
+
+![Ciclo de vida da revogação do consentimento](ciclo-vida-revogacao-consentimento.png)
+
 
 ### Fluxo de revogação realizado pelo usuário na iniciadora
 
