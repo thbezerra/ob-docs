@@ -121,7 +121,7 @@ Isto posto, a proposta de solução aqui presente tenta englobar toda essa compl
 ## Endpoint de revogação de consentimento
 
 O endpoint abaixo será usado para criar uma revogação para um consentimento de pagamento agendado.
-A revogação tem uma máquina de estados para suportar assincronismo na execução da revogação e contas que possuam mecanismo de múltipla alçada.
+A revogação tem uma máquina de estados para suportar assincronismo na execução da revogação em contas que possuam mecanismo de múltipla alçada.
 O campo **revoked_by** indica quem é o solicitante da revogação (usuário, iniciadora ou detentora). 
 Caso a revogação seja solicitada pelo usuário, deverá ser informado dados de login do usuário, além disso,
 ela estará sujeita ao mecanismo de múltipla alçada caso a conta a suporte.
