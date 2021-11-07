@@ -6,16 +6,18 @@
   - [Ciclo de vida do pagamento](#ciclo-de-vida-do-pagamento)
 - [Retentativas de liquidação de pagamentos](#retentativas-de-liquidação-de-pagamentos) 
 - [Revogação de consentimento para pagamentos agendados](#revogação-de-consentimento-para-pagamentos-agendados)
-  - [Endpoint de revogação de consentimento](#endpoint-de-revogação-de-consentimento)
-  - [Ciclo de vida da revogação do consentimento](#ciclo-de-vida-da-revogação-do-consentimento)
   - [Fluxo de revogação realizado pelo usuário na iniciadora](#fluxo-de-revogação-realizado-pelo-usuário-na-iniciadora)
   - [Fluxo de revogação realizado pela iniciadora](#fluxo-de-revogação-realizado-pela-iniciadora)
   - [Fluxo de revogação pelo usuário na detentora na área de gestão do Open Banking](#fluxo-de-revogação-pelo-usuário-na-detentora-na-área-de-gestão-do-Open-Banking)
   - [Fluxo de revogação pela detentora](#fluxo-de-revogação-pela-detentora)
   - [Fluxo de cancelamento de agendamento pelo usuário na detentora na área de arranjo PIX](#fluxo-de-cancelamento-de-agendamento-pelo-usuário-na-detentora-na-área-de-arranjo-PIX)
-  - [Endpoint de busca de revogação](#endpoint-de-busca-de-revogação)
-- [Alterações no endpoint de busca de dados do consentimento](#alterações-no-endpoint-de-busca-de-dados-do-consentimento)
-- [Alterações no endpoint de criação de pagamentos para suportar o agendamento](#alterações-no-endpoint-de-criação-de-pagamentos-para-suportar-o-agendamento)
+  - [Endpoint de revogação de consentimento](#endpoint-de-revogação-de-consentimento)
+    - [Proposta 1](#proposta-1)
+      - [Ciclo de vida da revogação do consentimento](#ciclo-de-vida-da-revogação-do-consentimento)
+      - [Endpoint de busca de revogação](#endpoint-de-busca-de-revogação)
+      - [Alterações no endpoint de busca de dados do consentimento](#alterações-no-endpoint-de-busca-de-dados-do-consentimento)
+    - [Proposta 2](#proposta-2)
+  - [Alterações no recurso de pagamentos para suportar a revogação de consentimento](#alterações-no-recurso-de-pagamentos-para-suportar-a-revogação-de-consentimento)
 - [Controle de andamento de modificações no consentimento](#controle-de-andamento-de-modificações-no-consentimento)
 - [Políticas de agendamento](#políticas-de-agendamento)
   - [Pagamento único](#política-de-agendamento-de-pagamento-único)
@@ -91,8 +93,9 @@ Com isso dois novos status listados abaixo deverão ser adicionados ao pagamento
 O status **SASP** abri a possibilidade de o processo de agendamento ser feito assincronamente na detentora.
 Isso será especialmente útil para o caso da detentora tiver diferentes sistemas para se comunicar de modo a realizar o agendamento.
 
-Para suportar o cancelamento de um pagamento agendado oriundo da revogação do consentimento deverá ser adicionado o novo valor: **CONSENT_REVOKED** para o enumerado [EnumRejectionReasonType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumPaymentType).    
-O **consentimento** deverá ser marcado como **SCHEDULED** ao fim do processo de agendamento bem-sucedido ou **CONSUMED** caso contrário.
+O **consentimento** deverá ser marcado como **SCHEDULED** e ao fim do processo de agendamento bem-sucedido ou **CONSUMED** caso contrário.
+Quando o pagamento for liquidado no dia do agendamento sendo bem-sucedido ou não, o consentimento deverá ser marcado como **consumido**, ou seja, atribuir o status **CONSUMED**. 
+
 
 ![Ciclo de vida do pagamento](ciclo-vida-agendamento-de-pagamentos.png)
 
@@ -119,7 +122,55 @@ Outro ponto importante apresentado é que esse processo deve ser o mais claro po
 estratégias de comunicação eficientes do ponto de vista de experiência da funcionalidade. 
 Isto posto, a proposta de solução aqui presente tenta englobar toda essa complexidade numa entidade que represente o processo iniciado contra um consentimento.
 
+### Fluxo de revogação realizado pelo usuário na iniciadora
+
+Abaixo é apresentado um diagrama do fluxo de revogação do consentimento realizado pelo usuário na iniciadora.  
+Lembro que este diagrama não é exaustivo do ponto de vista de fluxos possíveis lidando apenas um fluxo síncrono e com conta sem múltiplas alçadas.
+
+![Fluxo de revogação pelo usuário na iniciadora!](fluxo-revogacao-usuario-iniciadora.png)
+
+### Fluxo de revogação realizado pela iniciadora
+
+Abaixo é apresentado um diagrama do fluxo de revogação do consentimento realizado pela iniciadora sem a presença do usuário.  
+O caso típico de uso deste fluxo seria para revogar por questões de fraude descoberta pela iniciadora.
+Lembro que este diagrama não é exaustivo do ponto de vista fluxos possíveis lidando apenas um fluxo síncrono.
+
+![Fluxo de revogação pela iniciadora!](fluxo-revogacao-iniciadora.png)
+
+### Fluxo de revogação pelo usuário na detentora na área de gestão do Open Banking
+
+Abaixo é apresentado um diagrama do fluxo de revogação do consentimento realizado pelo usuário através da detentora na área de gestão do Open Banking.
+Lembro que este diagrama não é exaustivo do ponto de vista de fluxos possíveis lidando apenas um fluxo síncrono e com conta sem múltiplas alçadas.
+A iniciadora está monitorando o consentimento desde do momento da sua criação.  
+Em um dado momento, o usuário resolve revogar o consentimento direto na detentora.  
+Após o consentimento ser revogado a iniciadora obterá o status final do consentimento como revogado e irá parar o monitoramento.
+
+![Fluxo de revogação pelo usuário na detentora!](fluxo-revogacao-usuario-detentora.png)
+
+### Fluxo de revogação pela detentora
+
+Abaixo é apresentado um diagrama do fluxo de revogação do consentimento pela detentora sem a presença do usuário.
+O caso típico de uso deste fluxo seria para revogar por questões de fraude descoberta pela detentora.
+Lembro que este diagrama não é exaustivo do ponto de vista de fluxos possíveis lidando apenas um fluxo síncrono.
+A iniciadora está monitorando o consentimento desde do momento da sua criação.  
+Em um dado momento, a detentora resolve revogar o consentimento por questões de fraude, encerramento de conta e etc.  
+Após o consentimento ser revogado a iniciadora obterá o status final do consentimento como revogado e irá parar o monitoramento.
+
+![Fluxo de revogação pela detentora!](fluxo-revogacao-detentora.png)
+
+### Fluxo de cancelamento de agendamento pelo usuário na detentora na área de arranjo PIX
+
+Abaixo é apresentado um diagrama que mostra um fluxo que revoga o consentimento através do cancelamento de um agendamento de pagamento na área da detentora para o arranjo PIX.
+Lembro que este diagrama não é exaustivo do ponto de vista de fluxos possíveis lidando apenas um fluxo síncrono e com conta sem múltiplas alçadas.
+A iniciadora está monitorando o consentimento desde do momento da sua criação.  
+Em um dado momento, o usuário resolve cancelar o agendamento do PIX na detentora o que desencadeia a revogação do consentimento vinculado a ele.    
+Após o consentimento ser revogado a iniciadora obterá o status final do consentimento como revogado e irá parar o monitoramento.
+
+![Fluxo de revogação pelo usuário no arranjo pix na detentora!](fluxo-revogacao-usuario-detentora-pix.png)
+
 ## Endpoint de revogação de consentimento
+
+### Proposta 1
 
 O endpoint abaixo será usado para criar uma revogação para um consentimento de pagamento agendado.
 A revogação tem uma máquina de estados para suportar assincronismo na execução da revogação em contas que possuam mecanismo de múltipla alçada.
@@ -127,7 +178,7 @@ O campo **revoked_by** indica quem é o solicitante da revogação (usuário, in
 Caso a revogação seja solicitada pelo usuário, deverá ser informado dados de login do usuário, além disso,
 ela estará sujeita ao mecanismo de múltipla alçada caso a conta a suporte.
 
-### Regras de negócio
+#### Regras de negócio
 1. O consentimento de pagamento só pode ser revogado em caso de pagamento agendados, caso contrário o endpoint 
 deverá retornar um erro de negócio com o código HTTP 422 e no payload de erro o código **OPERATION_NOT_SUPPORTED_BY_CONSENT_TYPE**. 
 2. O consentimento de pagamento agendado só pode ser revogado até 1 dia antes da execução do pagamento, caso contrário o endpoint deverá retornar
@@ -135,7 +186,7 @@ um erro de negócio com o código HTTP 422 e no payload de erro o código **REVO
 3. O consentimento de pagamento agendado só pode ser revogado se estiver no status **[SCHEDULED](#ciclo-de-vida-do-consentimento)**, caso contrário o endpoint deverá retornar um erro de negócio com o código HTTP 422 e no payload do erro o código **OPERATION_NOT_ALLOWED_BY_STATUS**
 4. Só pode haver uma requisição de revogação em processamento ou completada para um dado consentimento de pagamento agendado, logo caso haja a tentativa de solicitar mais de uma revogação fora da regra descrita o sistema deverá retornar um erro de negócio com o código HTTP 422 e no payload de erro o código **REVOCATION_ALREADY_IN_PROCESS**. Deve-se atentar ao mecanismo de [idempotência](https://openbanking-brasil.github.io/areadesenvolvedor/#idempotencia) de chamadas antes aferir essa regra. 
 
-### Autenticação
+#### Autenticação
 
 Para chamar o endpoint descrito nesta sessão é necessário a utilização dos tokens conseguidos 
 através do processo de hybrid flow na criação do consentimento.
@@ -164,9 +215,9 @@ através do processo de hybrid flow na criação do consentimento.
 
 **Descrição dos campos da requisição**  
 
-1. **data** : **Tipo**: objeto, **obrigatório**, **Descrição**: Campo que contém os dados a requisição de cancelamento
+1. **data** : **Tipo**: objeto, **obrigatório**, **Descrição**: Campo que contém os dados da requisição de cancelamento
    1. **revoked_by** : **Tipo** : enumerado, **obrigatório**, **Descrição**: Descreve quem solicitou a revogação do consentimento. Valores: **USER** (Revogado pelo usuário), **ACCOUNT_HOLDER** (Dententora de conta), **INITIATOR** (iniciadora de pagamentos)
-   2. **loggedUser** : **Tipo** : objeto, **obrigatório quando o campo revoked_by tiver o valour USER** , **Descrição**: Indica o usuário logado na instituição escolhida por ele (Detentora ou iniciadora) para realizar a revogação do consentimento. 
+   2. **loggedUser** : **Tipo** : objeto, **obrigatório quando o campo revoked_by tiver o valor USER** , **Descrição**: Indica o usuário logado na instituição escolhida por ele (Detentora ou iniciadora) para realizar a revogação do consentimento. 
       1. **document**: **Tipo**: objeto, **obrigatório**, **Descrição**: Indica o documento de identificação do usuário.
          1. **identification**: **Tipo** : string, **obrigatório**, **Max length**: 11, **Pattern**: ^\d{11}$ , **Descrição**: Número do documento de identificação oficial do usuário.
          2. **rel**: **Tipo** : string, **obrigatório**, **Max length**: 3, **Pattern**: ^[A-Z]{3}$ , **Descrição** : Tipo do documento de identificação oficial do usuário
@@ -244,7 +295,7 @@ com exceção do campo code que neste caso terá um tipo enumerado novo cujos va
 3. code: **OPERATION_NOT_ALLOWED_BY_STATUS**, title: Operação não suportada, details: Operação não suportada para o status atual do consentimento
 4. code: **REVOCATION_ALREADY_IN_PROCESS**, title: Revogação já em processamento, details: Revogação já em andamento.  
 
-### Ciclo de vida da revogação do consentimento
+#### Ciclo de vida da revogação do consentimento
 
 Para suportar assincronismo e contas com múltiplas alçadas fora adicionado um ciclo de vida da revogação
 que vai do momento da sua criação até o momento da mudança de estado do consentimento para **revogado**.
@@ -258,54 +309,7 @@ O campo **status** da revogação é um enumerado com as seguintes possibilidade
 
 ![Ciclo de vida da revogação do consentimento](ciclo-vida-revogacao-consentimento.png)
 
-
-### Fluxo de revogação realizado pelo usuário na iniciadora
-
-Abaixo é apresentado um diagrama do fluxo de revogação do consentimento realizado pelo usuário na iniciadora.  
-Lembro que este diagrama não é exaustivo do ponto de vista de fluxos possíveis lidando apenas um fluxo síncrono e com conta sem múltiplas alçadas.   
-
-![Fluxo de revogação pelo usuário na iniciadora!](fluxo-revogacao-usuario-iniciadora.png)
-
-### Fluxo de revogação realizado pela iniciadora
-
-Abaixo é apresentado um diagrama do fluxo de revogação do consentimento realizado pela iniciadora sem a presença do usuário.  
-O caso típico de uso deste fluxo seria para revogar por questões de fraude descoberta pela iniciadora. 
-Lembro que este diagrama não é exaustivo do ponto de vista fluxos possíveis lidando apenas um fluxo síncrono.
-
-![Fluxo de revogação pela iniciadora!](fluxo-revogacao-iniciadora.png)
-
-### Fluxo de revogação pelo usuário na detentora na área de gestão do Open Banking
-
-Abaixo é apresentado um diagrama do fluxo de revogação do consentimento realizado pelo usuário através da detentora na área de gestão do Open Banking.
-Lembro que este diagrama não é exaustivo do ponto de vista de fluxos possíveis lidando apenas um fluxo síncrono e com conta sem múltiplas alçadas.
-A iniciadora está monitorando o consentimento desde do momento da sua criação.  
-Em um dado momento, o usuário resolve revogar o consentimento direto na detentora.  
-Após o consentimento ser revogado a iniciadora obterá o status final do consentimento como revogado e irá parar o monitoramento.
-
-![Fluxo de revogação pelo usuário na detentora!](fluxo-revogacao-usuario-detentora.png)
-
-### Fluxo de revogação pela detentora
-
-Abaixo é apresentado um diagrama do fluxo de revogação do consentimento pela detentora sem a presença do usuário.
-O caso típico de uso deste fluxo seria para revogar por questões de fraude descoberta pela detentora.
-Lembro que este diagrama não é exaustivo do ponto de vista de fluxos possíveis lidando apenas um fluxo síncrono.
-A iniciadora está monitorando o consentimento desde do momento da sua criação.  
-Em um dado momento, a detentora resolve revogar o consentimento por questões de fraude, encerramento de conta e etc.  
-Após o consentimento ser revogado a iniciadora obterá o status final do consentimento como revogado e irá parar o monitoramento.
-
-![Fluxo de revogação pela detentora!](fluxo-revogacao-detentora.png)
-
-### Fluxo de cancelamento de agendamento pelo usuário na detentora na área de arranjo PIX
-
-Abaixo é apresentado um diagrama que mostra um fluxo que revoga o consentimento através do cancelamento de um agendamento de pagamento na área da detentora para o arranjo PIX.
-Lembro que este diagrama não é exaustivo do ponto de vista de fluxos possíveis lidando apenas um fluxo síncrono e com conta sem múltiplas alçadas.
-A iniciadora está monitorando o consentimento desde do momento da sua criação.  
-Em um dado momento, o usuário resolve cancelar o agendamento do PIX na detentora o que desencadeia a revogação do consentimento vinculado a ele.    
-Após o consentimento ser revogado a iniciadora obterá o status final do consentimento como revogado e irá parar o monitoramento.  
-
-![Fluxo de revogação pelo usuário no arranjo pix na detentora!](fluxo-revogacao-usuario-detentora-pix.png)
-
-## Endpoint de busca de revogação
+### Endpoint de busca de revogação
 
 Este endpoint pode ser utilizado para obter os detalhes dos dados da revogação ou acompanhar o andamento do seu ciclo de vida.
 Lembro que toda busca de informação deve ser filtrada pelo clientId da iniciadora conseguido na camada de segurança para evitar vazamento de informações.
@@ -348,7 +352,7 @@ Lembro que toda busca de informação deve ser filtrada pelo clientId da iniciad
 }
 ```
 
-### Autenticação
+#### Autenticação
 
 Para chamar o endpoint descrito nesta sessão é necessário pode se usar tanto os tokens conseguidos
 através do processo de hybrid flow na criação do consentimento ou client credentials.
@@ -393,7 +397,6 @@ Para isso quando um consentimento estiver revogado pode ser adicionado na sessã
          "ibgeTownCode":"5300108",
          "details":{
             "localInstrument":"DICT",
-            "qrCode":"00020104141234567890123426660014BR.GOV.BCB.PIX014466756C616E6F32303139406578616D706C652E636F6D27300012\nBR.COM.OUTRO011001234567895204000053039865406123.455802BR5915NOMEDORECEBEDOR6008BRASILIA61087007490062\n530515RP12345678-201950300017BR.GOV.BCB.BRCODE01051.0.080450014BR.GOV.BCB.PIX0123PADRAO.URL.PIX/0123AB\nCD81390012BR.COM.OUTRO01190123.ABCD.3456.WXYZ6304EB76\n",
             "proxy":"12345678901",
             "creditorAccount":{
                "ispb":"12345678",
@@ -417,46 +420,166 @@ Para isso quando um consentimento estiver revogado pode ser adicionado na sessã
 }
 ```
 
-# Alterações no endpoint de criação de pagamentos para suportar o agendamento
+### Proposta 2
 
-Para suportar o agendamento de pagamentos deverá ser necessário saber quando o pagamento será executado.  
-Com isso será necessário a inclusão de um campo de nome **date** no pagamento do tipo: **string(date)** sendo obrigatório.  
-Esse novo campo deverá constar tanto na requisição: [CreatePixPaymentData](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_CreatePixPaymentData) 
-quanto na resposta: [ResponsePixPaymentData](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponsePixPaymentData) do endpoint de criação de pagamento.  
-Para pagamentos agendados o valor deverá ser a data futura do pagamento. Para pagamentos normais deverá ser a própria data corrente.  
-Este campo também será útil em futuras pesquisas de pagamentos em intervalos de datas sem considerar horário como expresso no campo **creationDateTime** hoje retornado na resposta da criação do pagamento.
-No momento da criação do pagamento agendado a detentora deverá verificar a data informada no pagamento está de acordo com consentimento. Caso a regra seja violada a detentora deverá responder com o código HTTP 422
-com o campo **code** com o valor **INCONSISTENT_PAYMENT_DATE** .  
+O endpoint abaixo será responsável por realizar a revogação do consentimento.
+Este endpoint não considera fluxo assíncrono para completude do processo de revogação em todos os pontos  
+da jornada de backend existente na detentora apenas focado nos dados do consentimento.  
+A detentora irá propagar as consequências da revogação do consentimento nos pontos pertinentes (recurso de pagamento, agendamento no maquinário PIX, etc) se valendo de [consistência eventual](https://en.wikipedia.org/wiki/Eventual_consistency) caso ela possua sistemas distribuídos
+gerenciando os diversos pontos.  
+Esta proposta desconsidera a necessidade de suporte a múltipla alçadas para realizar a revogação bem como a identificação de qual ator realizou a revogação e motivo da mesma.  
 
-### Exemplo de payload modificado ###
+**PATCH - payments/v1/consents/{consentId}**
+
+**Payload de requisição**
 
 ```
 {
-   "localInstrument":"DICT",
-   "payment":{
-      "date":"2022-12-10",
-      "amount":"100000.12",
-      "currency":"BRL"
-   },
-   "creditorAccount":{
-      "ispb":"12345678",
-      "issuer":"1774",
-      "number":"1234567890",
-      "accountType":"CACC"
-   },
-   "remittanceInformation":"Pagamento da nota XPTO035-002.",
-   "qrCode":"00020104141234567890123426660014BR.GOV.BCB.PIX014466756C616E6F32303139406578616D706C652E636F6D27300012\nBR.COM.OUTRO011001234567895204000053039865406123.455802BR5915NOMEDORECEBEDOR6008BRASILIA61087007490062\n530515RP12345678-201950300017BR.GOV.BCB.BRCODE01051.0.080450014BR.GOV.BCB.PIX0123PADRAO.URL.PIX/0123AB\nCD81390012BR.COM.OUTRO01190123.ABCD.3456.WXYZ6304EB76\n",
-   "proxy":"12345678901",
-   "cnpjInitiator":"50685362000135",
-   "transactionIdentification":"E00038166201907261559y6j6"
+   "data":{
+      "status":"REVOKED"
+   }
 }
 ```
 
-### Respostas ###
-**HTTP 422 (Schema: https://openbanking-brasil.github.io/areadesenvolvedor/#schema422responseerrorcreatepixpayment)**
-1. Introdução do valor: **"INCONSISTENT_PAYMENT_DATE"** no enumerado [EnumErrorsCreatePayment](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumErrorsCreatePayment) usado no campo **"code"** já presente no payload de resposta para este tipo de erro.
-2. Introdução da mensagem: **"Data de pagamento inconsistente."** no campo **"title"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
-3. Introdução da mensagem: **"Data de pagamento inconsistente com relação ao definido no consentimento."** no campo **"details"** caso o campo **"code"** tenha o valor definido no **item 1 desta lista**.
+**Descrição dos campos da requisição**
+
+1. **data** : **Tipo**: objeto, **obrigatório**, **Descrição**: Campo que contém os dados da requisição de cancelamento
+   1.**status**: **Tipo**: enumerado - [EnumAuthorisationStatusType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumAuthorisationStatusType), **obrigatório**, **Descrição** : Status que será assumido pelo consentimento. 
+   Apenas o valor **REVOKED** do enumerado será suportado. Caso essa regra seja violada a detentora deverá retornar o código HTTP 400 de resposta.  
+
+**Parâmetros da requisição**
+
+1. **consentId** : **Origem**: path, **tipo**: string, **obrigatório**, **descrição**: O consentId é o identificador único do consentimento que será revogado e deverá ser um URN
+   Uniform Resource Name.
+2. **Authorization** : **Origem**: header, **tipo**: string, **obrigatório**, **descrição**: Cabeçalho HTTP padrão. Permite que as credenciais sejam fornecidas dependendo do tipo de recurso solicitado
+3. **x-fapi-auth-date** : **Origem**: header, **tipo**: string, **opcional**, **descrição**: Data em que o usuário logou pela última vez com o receptor. Representada de acordo com a RFC7231.Exemplo: Sun, 10 Sep 2017 19:43:31 UTC
+4. **x-fapi-customer-ip-address**: **Origem**: header, **tipo**: string, **opcional**, **descrição**: O endereço IP do usuário se estiver atualmente logado com o receptor.
+5. **x-fapi-interaction-id** : **Origem**: header, **tipo**: string, **opcional**, **descrição**: Um UID RFC4122 usado como um ID de correlação. Se fornecido, o transmissor deve "reproduzir" esse valor no cabeçalho de resposta.
+6. **x-customer-user-agent** : **Origem**: header, **tipo**: string, **opcional**, **descrição**: Indica o user-agent que o usuário utiliza.
+
+**Respostas**  
+
+**HTTP 200** - Indica que o consentimento foi revogado conforme solicitado  
+
+```
+{
+   "data":{
+      "consentId":"urn:bancoex:C1DD33123",
+      "creationDateTime":"2021-05-21T08:30:00Z",
+      "expirationDateTime":"2021-05-21T08:30:00Z",
+      "ibgeTownCode":"5300108",
+      "statusUpdateDateTime":"2021-05-21T08:30:00Z",
+      "status":"REVOKED",
+      "loggedUser":{
+         "document":{
+            "identification":"11111111111",
+            "rel":"CPF"
+         }
+      },
+      "businessEntity":{
+         "document":{
+            "identification":"11111111111111",
+            "rel":"CNPJ"
+         }
+      },
+      "creditor":{
+         "personType":"PESSOA_NATURAL",
+         "cpfCnpj":"58764789000137",
+         "name":"Marco Antonio de Brito"
+      },
+      "payment":{
+         "type":"PIX",
+         "date":"2021-01-01",
+         "currency":"BRL",
+         "amount":"100000.12",
+         "ibgeTownCode":"5300108",
+         "details":{
+            "localInstrument":"DICT",
+            "proxy":"12345678901",
+            "creditorAccount":{
+               "ispb":"12345678",
+               "issuer":"1774",
+               "number":"1234567890",
+               "accountType":"CACC"
+            }
+         }
+      },
+      "debtorAccount":{
+         "ispb":"12345678",
+         "issuer":"1774",
+         "number":"1234567890",
+         "accountType":"CACC"
+      }
+   },
+   "links":{
+      "self":"https://api.banco.com.br/open-banking/api/payments/v1/consents/urn:bancoex:C1DD33123"
+   }
+}
+```
+
+**HTTP 422** : A solicitação foi bem formada, mas não pôde ser processada devido à lógica de negócios específica da solicitação.
+**Payload**:
+
+```
+{
+  "errors": [
+    {
+      "code": "OPERATION_NOT_ALLOWED_BY_STATUS",
+      "title": "Operação não permitida.",
+      "detail": "Operação não permitida devido ao status atual do consentimento."
+    }
+  ],
+  "meta": {
+    "totalRecords": 1,
+    "totalPages": 1,
+    "requestDateTime": "2021-05-21T08:30:00Z"
+  }
+}
+```
+O payload deste erro segue a mesma estrutura descrita em [422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent),
+com exceção do campo code que neste caso terá um tipo enumerado novo cujos valores possíveis serão: **OPERATION_NOT_SUPPORTED_BY_CONSENT_TYPE**,
+**REVOCATION_TIME_LIMIT_EXCEEDED**, **OPERATION_NOT_ALLOWED_BY_STATUS**.
+
+**Mensagens de erro**
+1. code: **OPERATION_NOT_SUPPORTED_BY_CONSENT_TYPE**, title: Operação não suportada, details: Operação não suportada pelo tipo de consentimento
+2. code: **REVOCATION_TIME_LIMIT_EXCEEDED**, title: Prazo limite para revogação excedido, details: Prazo limite para revogação excedido
+3. code: **OPERATION_NOT_ALLOWED_BY_STATUS**, title: Operação não suportada, details: Operação não suportada para o status atual do consentimento
+
+# Alterações no recurso de pagamentos para suportar a revogação de consentimento
+
+A máquina de estados do pagamento está intimamente ligada a máquina de estados do consentimento, pois algumas translações de estados
+de cada um dos recursos citados dispara mudanças no outro. Um desses casos é a revogação do consentimento que terá o seu impacto no pagamento descrito a seguir.  
+Quando o consentimento for revogado o pagamento agendado vinculado ao mesmo deve ir para o status **RJCT** (Rejeitado) e o motivo da sua rejeição descrito no campo **rejectionReason**  
+deve assumir o valor **CONSENT_REVOKED** que deverá ser adicionado ao schema [EnumRejectionReasonType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumRejectionReasonType).
+
+**Exemplo**
+
+```
+{
+   "data":{
+      "paymentId":"TXpRMU9UQTROMWhZV2xSU1FUazJSMDl",
+      "consentId":"urn:bancoex:C1DD33123",
+      "creationDateTime":"2020-07-21T08:30:00Z",
+      "statusUpdateDateTime":"2020-07-21T08:30:00Z",
+      "proxy":"12345678901",
+      "status":"RJCT",
+      "rejectionReason":"CONSENT_REVOKED",
+      "localInstrument":"DICT",
+      "cnpjInitiator":"50685362000135",
+      "payment":{
+         "amount":"100000.12",
+         "currency":"BRL"
+      },
+      "remittanceInformation":"Pagamento da nota RSTO035-002.",
+      "creditorAccount":{
+         "ispb":"12345678",
+         "issuer":"1774",
+         "number":"1234567890",
+         "accountType":"CACC"
+      }
+   }
+}
+```
 
 # Controle de andamento de modificações no consentimento
 
