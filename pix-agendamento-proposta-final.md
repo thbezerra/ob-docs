@@ -150,7 +150,7 @@
   **Parâmetros**  
 
   |Nome|Origem|Tipo|Requerido|Descrição|
-  |-----------------|----------|------------|---------|---------------------------------------------------------------------|
+  |-----------------|----------|------------|---------|---------------------------------------------------------------------------------------------------------------------------|
   |**consentId**|path|string|sim|O consentId é o identificador único do consentimento a ser revogado e deverá ser um URN - Uniform Resource Name.|
   |**Authorization**|header|string|sim|Cabeçalho HTTP padrão. Permite que as credenciais sejam fornecidas dependendo do tipo de recurso solicitado.|
   |**x-fapi-auth-date**|header|string|não|Data em que o usuário logou pela última vez com o receptor. Representada de acordo com a RFC7231.Exemplo: Sun, 10 Sep 2017 19:43:31 UTC|
@@ -190,7 +190,7 @@
   **Descrição dos campos**
 
   |**Campo**|**Tipo**|**Requerido**|**Descrição**|Regras de negócio|
-  |----------|------|---------|--------------------------------------------------------|---------|
+  |----------|------|---------|---------------------------------------------------------------------------------------------------------------|---------|
   |**data.status**|enumerado(string) - [EnumAuthorisationStatusType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumAccountPaymentsType)|sim|Status para qual o consentimento seguirá. Apenas o valor **REVOKED** será suportado no momento|[RN100](#regras-de-validação)|
   |**data.revocation**|objeto|sim|Objeto que contém as informações das circunstância da revogação|N/A|
   |**data.revocation.loggedUser**|objeto|condicionalmente|Representa o usuário (pessoa natural) que encontra-se logado na instituição Iniciadora de Pagamento.|[RN103](#regras-de-validação),[RN104](#regras-de-validação)|
@@ -236,7 +236,7 @@ os novos status conforme descrito em [Ciclo de vida](#ciclo-de-vida-de-consentim
 ### Regras funcionais
 
 |**Código**|**Descrição**|Endpoint|
-|----------|-----------------------------------------------------------------------------|------------|
+|----------|-----------------------------------------------------------------------------------------------------------|------------|
 |**RN001**|Ao criar um consentimento para pagamentos agendados o campo **expirationDateTime** do schema [ResponsePaymentConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponsePaymentConsent) deve receber o último segundo da data alvo de liquidação do pagamento. Ex: 2021-05-21T23:59:59Z|[Criar consentimento](#criar-consentimento)|
 |**RN002**|Ao revogar um consentimento o pagamento associado deverá ir para o status **RJCT** e campo **rejectionReason** deverá ter o valor **CONSENT_REVOKED**. Schema: [EnumRejectionReasonType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumRejectionReasonType) |[Revogar consentimento](#revogar-consentimento)|
 
@@ -244,7 +244,7 @@ os novos status conforme descrito em [Ciclo de vida](#ciclo-de-vida-de-consentim
 ### Regras de validação
 
 |**Código**|**Descrição**|Endpoint|Resposta HTTP|Código de Erro|Título|Mensagem|Schema|
-|----------|------------------------------------------------------------------------------|-----------------|-------|----------------|--------------------------|-----------------------------|--------------------------|
+|----------|------------------------------------------------------------------------------------------------------------------------------------------|-----------------|-------|----------------|--------------------------|-----------------------------|--------------------------|
 |**RN100**|Os campos **data.payment.schedule** e **data.payment.date** são mutuamente exclusivos|[Criar consentimento](#criar-consentimento)|400|Livre|Livre|Livre|[ResponseError](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponseError)|
 |**RN101**|O campo **data.payment.schedule.date** deverá sempre ser no mínimo D+1 corrido em relação a data do consentimento|[Criar consentimento](#criar-consentimento)|422|**INVALID_SCHEDULE**|Agendamento inválido|Agendamento inválido|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
 |**RN102**|O campo **data.status** na revogação do consentimento só deverá aceitar o valor **REVOKED**|[Revogar consentimento](#revogar-consentimento)|400|Livre|Livre|Livre|[ResponseError](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponseError)|
