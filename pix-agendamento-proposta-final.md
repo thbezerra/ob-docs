@@ -118,7 +118,7 @@
   
   **GET /payments/v1/pix/payments/{paymentId}**
 
-  Nenhuma mudança estrutural neste endpoint será feita para realizar o agendamento. Apenas será incluído os novos status conforme descrito em [Ciclo de vida](#ciclo-de-vida-de-consentimentos-e-pagamentos-agendados)
+  Nenhuma mudança estrutural neste endpoint será feita para realizar o agendamento. Apenas será incluído os novos status conforme descrito em [Ciclo de vida](#ciclo-de-vida-de-consentimentos-e-pagamentos-agendados) e motivos de rejeição.
 
 ## Mecanismo de retentativas de liquidação de pagamentos agendados
 
