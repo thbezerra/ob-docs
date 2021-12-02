@@ -50,11 +50,9 @@
   ![Ciclo de vida do pagamento agendado](ciclo-vida-pagamento-agendado.png)
 
 # Controle de acesso
-  A funcionalidade agendamento não introduz novas necessidades de controle de acesso ao que já é praticado na modalidade de pagamentos normais.  
-  Nesta sessão apenas gostaríamos de ratificar que o controle do tempo de vida máximo dos access tokens obtidos pelo processo de hybrid flow estão vinculados
-  ao tempo de expiração do consentimento. Esta premissa será especialmente útil a funcionalidade de agendamento que estende o tempo de expiração do consentimento
-  até o último instante do dia alvo da liquidação do pagamento.
-
+  A funcionalidade agendamento não introduz novas necessidades de controle de acesso ao que já é praticado na modalidade de pagamentos normais.
+  Nesta sessão apenas gostaríamos de ratificar que o controle do tempo de vida máximo dos access tokens obtidos pelo processo de hybrid flow estão vinculados ao tempo de expiração do consentimento, deste modo
+  A iniciadora poderá obter novos Acces-Tokens através do seu Reflesh Token até que o consentimento atinga sua data de expiração.
 # Agendamento de pagamentos
   A funcionalidade de agendamento proposta apenas permite agendamentos para pagamentos únicos, ou seja, sem recorrência.  
   O suporte a recorrência será estudado no futuro caso haja necessidade.  
