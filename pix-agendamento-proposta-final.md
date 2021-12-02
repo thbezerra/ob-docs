@@ -206,7 +206,7 @@
 
   **Controle de acesso**
 
-  Este endpoint deve suportar tanto ser chamado usando client credentials ou tokens oriundos do processo de hybrid flow.
+  Este endpoint deve suportar tanto ser chamado usando client credentials.
 
   **Regras de negócio**
 
