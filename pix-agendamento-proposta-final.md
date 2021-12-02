@@ -206,7 +206,7 @@
 
   **Controle de acesso**
 
-  Este endpoint deve suportar tanto ser chamado usando client credentials.
+  Este endpoint deve suportar apenas ser chamado usando client credentials.
 
   **Regras de negócio**
 
