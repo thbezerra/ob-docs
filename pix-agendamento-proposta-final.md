@@ -63,7 +63,7 @@
   A jornada para realizar agendamentos de pagamentos fundamentalmente é semelhante à jornada de um pagamento normal  
   facilitando o processo de suporte a funcionalidade.
 
-  ![Jornada de pagamentos agendados](jornada-pagamento-agendado.png)
+  ![Jornada de pagamentos agendados](jornada-pagamentoagendado.png)
 
 ## Endpoints
 
