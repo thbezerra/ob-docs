@@ -50,9 +50,10 @@
   ![Ciclo de vida do pagamento agendado](ciclo-vida-pagamento-agendado.png)
 
 # Controle de acesso
-  A funcionalidade agendamento não introduz novas necessidades de controle de acesso ao que já é praticado na modalidade de pagamentos normais.
-  Nesta sessão apenas gostaríamos de ratificar que o controle do tempo de vida máximo dos access tokens obtidos pelo processo de hybrid flow estão vinculados ao tempo de expiração do consentimento, deste modo
-  A iniciadora poderá obter novos Acces-Tokens através do seu Reflesh Token até que o consentimento atinga sua data de expiração.
+  A funcionalidade agendamento não introduz novas necessidades de controle de acesso ao que já é praticado na modalidade de pagamentos normais.  
+  Nesta sessão apenas gostaríamos de ratificar que o controle do tempo de vida máximo dos access tokens obtidos pelo processo de hybrid flow estão vinculados ao tempo de expiração do consentimento, deste modo  
+  a iniciadora poderá obter novos Acces-Tokens através do seu Reflesh Token até que o consentimento atinga sua data de expiração.
+
 # Agendamento de pagamentos
   A funcionalidade de agendamento proposta apenas permite agendamentos para pagamentos únicos, ou seja, sem recorrência.  
   O suporte a recorrência será estudado no futuro caso haja necessidade.  
@@ -93,9 +94,9 @@
   
   |**Campo**|**Tipo**|**Requerido**|**Descrição**|Regras de negócio|
   |----------|------|---------|--------------------------------------------------------|---------|
-  |**data.payment.schedule**|objeto|condicionalmente|Define o agendamento do pagamento. Utilizado somente na funcionalidade de agendamento de pagamentos|[RN100](#regras-de-validação)|
+  |**data.payment.schedule**|objeto|condicionalmente|Define o agendamento do pagamento. Utilizado somente na funcionalidade de agendamento de pagamentos|N/A|
   |**data.payment.schedule.single**|objeto|sim|Define a política de agendamento único|N/A|
-  |**data.payment.schedule.single.date**|string(date)|sim|Define a data alvo da liquidação do pagamento|[RN101](#regras-de-validação)|
+  |**data.payment.schedule.single.date**|string(date)|sim|Define a data alvo da liquidação do pagamento.O fuso Horário de Brasilia deve ser utilizado para criação e racionalização sobre os dados deste campo|[RN101](#regras-de-validação), [RN103](#regras-de-validação)|
   
    **Regras de negócio**
    1. [RN001](#regras-funcionais)
@@ -170,12 +171,6 @@
                "rel":"CPF"
             }
          },
-         "businessEntity":{
-            "document":{
-               "identification":"11111111111111",
-               "rel":"CNPJ"
-            }
-         },
          "revoked_by":"USER",
          "reason":{
             "code":"OTHER",
@@ -191,18 +186,14 @@
   |----------|------|---------|---------------------------------------------------------------------------------------------------------------|---------|
   |**data.status**|enumerado(string) - [EnumAuthorisationStatusType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumAccountPaymentsType)|sim|Status para qual o consentimento seguirá. Apenas o valor **REVOKED** será suportado no momento|[RN100](#regras-de-validação)|
   |**data.revocation**|objeto|sim|Objeto que contém as informações das circunstância da revogação|N/A|
-  |**data.revocation.loggedUser**|objeto|condicionalmente|Representa o usuário (pessoa natural) que encontra-se logado na instituição Iniciadora de Pagamento.|[RN103](#regras-de-validação),[RN104](#regras-de-validação)|
+  |**data.revocation.loggedUser**|objeto|condicionalmente|Representa o usuário (pessoa natural) que encontra-se logado na instituição Iniciadora de Pagamento.|[RN104](#regras-de-validação)|
   |**data.revocation.loggedUser.document**|objeto|sim|Objeto que contém os dados de identificação do usuário.|N/A|
   |**data.revocation.loggedUser.document.identification**|string|sim|Número do documento de identificação oficial do usuário.|N/A|
   |**data.revocation.loggedUser.document.rel**|string|sim|Tipo do documento de identificação oficial do usuário.|N/A|
-  |**data.revocation.businessEntity**|objeto|condicionalmente|Usuário (pessoa jurídica) que encontra-se logado na instituição Iniciadora de Pagamento. Preenchimento obrigatório se usuário logado na instituição Iniciadora de Pagamento for um CNPJ (pessoa jurídica).|[RN103](#regras-de-validação),[RN104](#regras-de-validação)|
-  |**data.revocation.businessEntity.document**|objeto|sim|Objeto que contém os dados de identificação do usuário.|N/A|
-  |**data.revocation.businessEntity.document.identification**|string|sim|Número do documento de identificação oficial do usuário.|N/A|
-  |**data.revocation.businessEntity.document.rel**|string|sim|Tipo do documento de identificação oficial do usuário.|N/A|
-  |**data.revocation.revoked_by**|enumerado(string)|sim|Define qual das partes envolvidas na transação está realizando a revogação. Valores possíveis: **USER** (Revogado pelo usuário), **ACCOUNT_HOLDER** (Dententora de conta), **INITIATOR** (iniciadora de pagamentos).|N/A|
+  |**data.revocation.revoked_by**|enumerado(string)|sim|Define qual das partes envolvidas na transação está realizando a revogação. Valores possíveis: **USER** (Revogado pelo usuário), **ASPSP** (Provedor de serviços de pagamento para serviços de conta - Detentora de conta), **TPP** (Instituições Provedoras - iniciadora de pagamentos).|N/A|
   |**data.revocation.reason**|objeto|sim|Define a razão pela qual o consentimento foi revogado|N/A|
   |**data.revocation.reason.code**|enumerado(string)|sim|Define o código da razão pela qual o consentimento foi revogado. Valores possíveis: **FRAUD** (Indica suspeita de fraude), **ACCOUNT_CLOSURE** (Indica que a conta do usuário foi encerrada), **OTHER** (Indica que motivo do cancelamento está fora dos motivos pré-estabelecidos) |[RN108](#regras-de-validação)|
-  |**data.revocation.reason.additionalInformation**|string|condicionalmente|Contém informações adicionais definidas pelo requisitante da revogação|[RN109](#regras-de-validação)|
+  |**data.revocation.reason.additionalInformation**|string(máximo: 255 Caracteres)|condicionalmente|Contém informações adicionais definidas pelo requisitante da revogação|[RN109](#regras-de-validação)|
 
   **Controle de acesso**
 
@@ -235,22 +226,19 @@ os novos status conforme descrito em [Ciclo de vida](#ciclo-de-vida-de-consentim
 
 |**Código**|**Descrição**|Endpoint|
 |----------|-----------------------------------------------------------------------------------------------------------|------------|
-|**RN001**|Ao criar um consentimento para pagamentos agendados o campo **expirationDateTime** do schema [ResponsePaymentConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponsePaymentConsent) deve receber o último segundo da data alvo de liquidação do pagamento. Ex: 2021-05-21T23:59:59Z|[Criar consentimento](#criar-consentimento)|
-|**RN002**|Ao revogar um consentimento o pagamento associado deverá ir para o status **RJCT** e campo **rejectionReason** deverá ter o valor **CONSENT_REVOKED**. Schema: [EnumRejectionReasonType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumRejectionReasonType) |[Revogar consentimento](#revogar-consentimento)|
+|**RN001**|Ao revogar um consentimento o pagamento associado deverá ir para o status **RJCT** e campo **rejectionReason** deverá ter o valor **CONSENT_REVOKED**. Schema: [EnumRejectionReasonType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumRejectionReasonType) |[Revogar consentimento](#revogar-consentimento)|
 
 
 ### Regras de validação
 
 |**Código**|**Descrição**|Endpoint|Resposta HTTP|Código de Erro|Título|Mensagem|Schema|
 |----------|------------------------------------------------------------------------------------------------------------------------------------------|-----------------|-------|----------------|--------------------------|-----------------------------|--------------------------|
-|**RN100**|Os campos **data.payment.schedule** e **data.payment.date** são mutuamente exclusivos|[Criar consentimento](#criar-consentimento)|400|Livre|Livre|Livre|[ResponseError](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponseError)|
-|**RN101**|O campo **data.payment.schedule.date** deverá sempre ser no mínimo D+1 corrido, ou seja, a data imediatamente posterior em relação a data do consentimento|[Criar consentimento](#criar-consentimento)|422|**INVALID_SCHEDULE**|Agendamento inválido|Agendamento inválido|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
+|**RN101**|O campo **data.payment.schedule.single.date** deverá sempre ser no mínimo D+1 corrido, ou seja, a data imediatamente posterior em relação a data do consentimento considerando o fuso horário de Brasília|[Criar consentimento](#criar-consentimento)|422|**INVALID_SCHEDULE**|Agendamento inválido|Agendamento inválido|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
 |**RN102**|O campo **data.status** na revogação do consentimento só deverá aceitar o valor **REVOKED**|[Revogar consentimento](#revogar-consentimento)|400|Livre|Livre|Livre|[ResponseError](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponseError)|
-|**RN103**|Os campos **data.revocation.loggedUser** e **data.revocation.businessEntity** são mutuamente exclusivos|[Revogar consentimento](#revogar-consentimento)|400|Livre|Livre|Livre|[ResponseError](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponseError)|
-|**RN104**|O campo **data.revocation.loggedUser** ou **data.revocation.businessEntity** devem se preenchidos quando a revogação for feita pelo usuário final, ou seja, se o campo **data.revocation.revoked_by** estiver com o valor **USER**|422|USER_INFORMATION_REQUIRED|Informação do usuário requerida|Informação do usuário requerida|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
+|**RN103**|O campo **data.payment.schedule.single.date** deverá ser no máximo um ano corrido a partir da data do consentimento considerando o fuso horário de Brasília|[Criar consentimento](#criar-consentimento)|422|**INVALID_SCHEDULE**|Agendamento inválido|Agendamento inválido|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
+|**RN104**|O campo **data.revocation.loggedUser** deve ser preenchidos quando a revogação for feita pelo usuário final, ou seja, se o campo **data.revocation.revoked_by** estiver com o valor **USER**|422|USER_INFORMATION_REQUIRED|Informação do usuário requerida|Informação do usuário requerida|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
 |**RN105**|O consentimento só pode ser revogado nos status **CONSUMED**|[Revogar consentimento](#revogar-consentimento)|422|OPERATION_NOT_ALLOWED_BY_STATUS|Operação não permitida|Operação não permitida devido ao status atual do consentimento|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
 |**RN106**|Somente consentimentos para pagamentos agendados podem ser revogados, ou seja, que possuam o campo **data.payment.schedule** preenchido|[Revogar consentimento](#revogar-consentimento)|422|OPERATION_NOT_SUPPORTED_BY_CONSENT_TYPE|Operação não permitida|Operação não suportada pelo tipo de consentimento|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
 |**RN107**|O consentimento só pode ser revogado até o dia anterior, ou seja, a meia noite no fuso horário de Brasília do dia imediatamente anterior a data alvo da liquidação do pagamento|[Revogar consentimento](#revogar-consentimento)|422|REVOCATION_TIME_LIMIT_EXCEEDED|Prazo limite para revogação excedido|Prazo limite para revogação excedido|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
-|**RN108**|Os motivos de revogação do consentimento: **FRAUD** e **ACCOUNT_CLOSURE** só podem ser usados caso o campo: **data.revocation.revoked_by** tenha o valor **INITIATIOR** ou **ACCOUNT_HOLDER**, ou seja, somente no caso de revogação unilateral pela iniciadora ou detentora|[Revogar consentimento](#revogar-consentimento)|422|REVOCATION_REASON_NOT_ALLOWED|Motivo de revogação não permitido|Motivo de revogação não permitido|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
+|**RN108**|Os motivos de revogação do consentimento: **FRAUD** e **ACCOUNT_CLOSURE** só podem ser usados caso o campo: **data.revocation.revoked_by** tenha o valor **TPP** ou **ASPSP**, ou seja, somente no caso de revogação unilateral pela iniciadora ou detentora|[Revogar consentimento](#revogar-consentimento)|422|REVOCATION_REASON_NOT_ALLOWED|Motivo de revogação não permitido|Motivo de revogação não permitido|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
 |**RN109**|O campo **data.revocation.reason.additionalInformation** é obrigatório quando o motivo de revogação for **OTHER**|[Revogar consentimento](#revogar-consentimento)|422|REVOCATION_ADDITIONAL_INFORMATION_REQUIRED|Informação adicional requerida|Informação adicional requerida|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
-|**RN110**|Apenas quando o consentimento for revogado pelo usuário, ou seja, o campo **data.revocation.revoked_by** for **USER** o access token conseguido via hybrid flow deverá ser usado para realizar a requisição|[Revogar consentimento](#revogar-consentimento)|403|LIVRE|LIVRE|LIVRE|[ResponseError](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_ResponseError)|
