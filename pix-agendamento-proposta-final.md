@@ -96,7 +96,7 @@
   |----------|------|---------|--------------------------------------------------------|---------|
   |**data.payment.schedule**|objeto|condicionalmente|Define o agendamento do pagamento. Utilizado somente na funcionalidade de agendamento de pagamentos|N/A|
   |**data.payment.schedule.single**|objeto|sim|Define a política de agendamento único|N/A|
-  |**data.payment.schedule.single.date**|string(date)|sim|Define a data alvo da liquidação do pagamento.O fuso Horário de Brasilia deve ser utilizado para criação e racionalização sobre os dados deste campo|[RN101](#regras-de-validação), [RN103](#regras-de-validação)|
+  |**data.payment.schedule.single.date**|string(date)|sim|Define a data alvo da liquidação do pagamento.O fuso horário de Brasilia deve ser utilizado para criação e racionalização sobre os dados deste campo|[RN101](#regras-de-validação), [RN103](#regras-de-validação)|
   
    **Regras de negócio**
    1. [RN001](#regras-funcionais)
