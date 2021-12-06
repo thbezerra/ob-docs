@@ -22,9 +22,9 @@
   
 # Introdução
   Esta proposta visa adicionar suporte a agendamento de pagamentos para datas futuras tendo como 
-  alvo inicial o suporte a pagamento agendados para o arranjo Pix, contudo pavimentando a possibilidade
-  de adição de semelhante funcionalidade a outros meios de pagamentos posteriormente.  
-  Toda a proposta fora escrita tendo o controle do mecanismo de agendamento junto as detentoras de contas.
+  alvo inicial o suporte a pagamento agendados únicos (Sem recorrência) para o arranjo Pix, contudo pavimentando a possibilidade
+  de adição de semelhante funcionalidade a outros meios de pagamentos posteriormente, pois as mudanças principais estão no consentimento.  
+  Toda a proposta fora escrita tendo o controle do mecanismo de agendamento junto as detentoras de contas.  
 
 # Ciclo de vida de consentimentos e pagamentos agendados
 
