@@ -125,7 +125,7 @@
 
   No momento da liquidação de pagamentos agendados é possível ter falhas sistêmicas ou violações de regras de negócio passiveis de recuperação em segundo momento 
   como, por exemplo, ausência de saldo na conta do pagador para realizar a liquidação. Neste contexto poderia ser interessante as detentoras de conta a adoção de políticas de retentativa de liquidação.  
-  O arranjo PIX no define nada a respeito deste tema, então por consequência o Open Banking deixa livre para cada detentora adotar a política
+  O arranjo PIX não define nada a respeito deste tema, então por consequência o Open Banking deixa livre para cada detentora adotar a política
   de retentativa que mais fazer sentido para ela. 
 
 # Revogação do consentimento
