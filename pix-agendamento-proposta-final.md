@@ -72,7 +72,9 @@
   
   **POST /payments/v1/consents**
   
-  Os consentimentos criados por este endpoint terão a adição de novo objeto que írá conter os dados do agendamento conforme descrito adiante. 
+  Os consentimentos criados por este endpoint terão a adição de novo objeto que írá conter os dados do agendamento conforme descrito adiante.  
+  Este novo objeto está sendo adicionado ao consentimento, portanto, agnóstico aos tipos de pagamentos, ou seja, PIX, TED/TEF e outros arranjos  
+  irão reutilizar o aqui definido.
   
   **Fragmento do consentimento com a estrutura do objeto de agendamento**
 ```
