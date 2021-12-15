@@ -1,18 +1,6 @@
 ```
 {
    "data":{
-      "loggedUser":{
-         "document":{
-            "identification":"11111111111",
-            "rel":"CPF"
-         }
-      },
-      "businessEntity":{
-         "document":{
-            "identification":"11111111111111",
-            "rel":"CNPJ"
-         }
-      },
       "creditor":{
          "personType":"PESSOA_NATURAL",
          "cpfCnpj":"58764789000137",
