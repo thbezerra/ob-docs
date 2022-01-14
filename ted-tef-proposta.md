@@ -125,6 +125,7 @@ Também serão descritos os campos novos, ou seja, introduzidos pelos novos arra
          },
          "currency":"BRL",
          "amount":"100000.12",
+         "proxy":"xpot@xpot.com.br",
          "creditorAccount":{
             "ispb":"12345678",
             "issuer":"1774",
@@ -135,10 +136,23 @@ Também serão descritos os campos novos, ou seja, introduzidos pelos novos arra
    }
 }
 ```
+**Campos novos ou alterados do payload para TEF**
+|**Campo**|**Tipo**|**Requerido**|**Descrição**|Regras de negócio|
+|----------|------|---------|--------------------------------------------------------|---------|
+|**data.payment.proxy**|(string)|nao|Alias utilizado pela instituição para identificar a conta de destino do transferencia.|
+|**data.payment.creditorAccount**|Object|nao|Conta do destinatario do TEF|
+
+A iniciação de pagamento para TEF permite que a iniciadora informe a conta de destino diretamente ou o proxy (identificador da conta na instituição ) no momento da iniciação.
+Caso a detentora de conta identifique a conta informada pelo Alias e a jornada de consentimento se contretis a detentora deverá retonar no payload de response o objeto creditorAccount com a informação da conta associada ao proxy informado.
+Importante atentar que a iniciadora deverá utilizar o creditorAccount retornado para prosseguir com a transação.
+
 
 A iniciação de pagamentos para TED não suporta todos os tipos de contas de crédito disponíveis pelo Open Banking, sendo suportado somente conta corrente, poupança e pagamentos ([RN302](#regras-de-validação)).  
+
 O arranjo de TED possui uma grade de horários definida de funcionamento pelo Bacen. Além disso, muitas instituições limitam ainda mais a grade de funcionamento deste arranjo nos seus canais de oferta de TED, portanto esse aspectos precisam ser validados no momento do consentimento ([RN303](#regras-de-validação)).  
+
 Tanto o arranjo TED quanto TEF podem apresentar restrições de limites para transferências estipuladas nas detentoras de conta, devendo isso ser considerado ao criar o consentimento([RN304](#regras-de-validação)).  
+
 As alterações na requisição de criação do consentimento devem refletir também tanto na resposta do endpoint de criação de pagamento quanto na resposta do endpoint de busca do consentimento. 
    
   
