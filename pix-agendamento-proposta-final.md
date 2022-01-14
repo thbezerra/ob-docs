@@ -17,7 +17,7 @@
     - [Revogar consentimento](#revogar-consentimento)
     - [Consultar consentimento](#consultar-consentimento-revogado)
     - [Consultar pagamento agendado PIX](#consultar-pagamento-pix)
-- [Regra de negócio](#regras-de-negcio)
+- [Regras de negócio](#regras-de-negcio)
  
   
 # Introdução

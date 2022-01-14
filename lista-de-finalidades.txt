@@ -1,0 +1,97 @@
+1 - Pagamento de Impostos, Tributos e Taxas
+10 - Crédito em Conta
+100 - Depósito Judicial
+101 - Pensão Alimentícia
+103 - Cessão de créditos - Liquid.principal por aquis.créditos ou direitos creditórios ou fluxo de caixa garant.por créditos, por ordem cliente PJ financ.
+104 - Cessão de créditos - Liquidação principal por aquisição de créditos ou direitos creditórios, por ordem de FIDC ou cia securitizadora
+107 - Cessão de créditos - Repasse contratual de fluxo de caixa ou de recebíveis pagos, por ordem de cliente PJ financeira
+108 - Cessão de créditos - Repasse contratual de fluxo de caixa ou de recebíveis pagos antecipadamente, por ordem de cliente PJ financeira
+109 - Cessão de créditos - Ajustes diversos
+11 - Pagamento a Corretoras
+110 - Transferência entre contas de mesma titularidade
+111 - Crédito para investidor em cliente da IF Creditada
+112 - Débito de investidor em cliente da IF Debitada
+113 - Pagamento de Operações de Crédito por Cliente
+114 - Resgate de aplicação financeira de cliente para conta de sua titularidade
+117 - Aplicação financeira em nome do cliente remetente
+12 - Pagamento de Boleto Bancário em Cartório
+121 - Pagamento da TIR - Pix Saque e/ou Pix Troco
+123 - Cessão de créditos - Liquid.princ.por recompra de créditos ou direitos creditórios ou fluxo de caixa garant.por créditos, por ordem cliente PJ financ.
+124 - Cessão de créditos - Liquidação principal por recompra de créditos ou direitos creditórios, por ordem de FIDC ou cia securitizadora
+13 - Pagamento de Tarifas pela Prestação de Serviços de Arrecadação de Convênios
+131 - FGCoop - Recolhimento Fundo Garantidor do Cooperativismo de Crédito
+132 - FGCoop - devolução de recolhimento a maior
+136 - FGTS - Saque Emergencial
+139 - Crédito ao consumidor decorrente de programa de incentivo fiscal
+14 - Repasse de Valores Referentes a Títulos Liquidados em Cartórios de Protesto
+149 - Auxílio Emergencial Lei 13.982
+15 - Liquidação Financeira de Operadora de Cartão
+150 - Benefício Emergencial de Preservação do Emprego e da Renda - BEm
+157 - Tributos Municipais ISS - LCP 157
+175 - Tributos Municipais ISS TERCEIROS - LCP 157
+18 - Operações Seguro Habitacional - SFH
+19 - Operações do FDS - Caixa
+2 - Pagamento à Concessionárias de Serviço Público
+200 - Transferência Internacional em Reais
+201 - Ajuste Posição Mercado Futuro
+202 - Repasse de Valores do BNDES
+203 - Liquidação de Compromissos Junto ao BNDES
+204 - Operações de Compra e Venda de Ações - Bolsas de Valores e Mercado de Balcão
+205 - Contratos Referenciados em Ações ou Índices de Ações - Bolsas de Valores, de Mercadorias e de futuros
+206 - Operação de Câmbio - Não Interbancária
+207 - Operações no Mercado de Renda Fixa e de Renda Variável com Utilização de Intermediário
+208 - Operação de Câmbio - Mercado Interbancário - Instituições sem conta Reservas Bancárias
+209 - Pagamento de Operações com identificação de destinatário final
+23 - Taxa de Administração
+27 - Pagamento de Acordo / Execução Judicial
+28 - Liquidação de Empréstimos Consignados
+29 - Pagamento de bolsa auxílio
+3 - Pagamentos de Dividendos
+30 - Remuneração a cooperado
+300 - Restituição de Imposto de Renda
+301 - Ordem Bancária do Tesouro - OBT
+302 - Pagamento de multas ao BACEN por atrasos de importação
+303 - Restituição de tributos - RFB
+31 - Pagamento de prebenda (Remuneração a padres e sacerdotes)
+33 - Pagamento de juros sobre capital próprio
+34 - Pagamento de rendimentos ou amortização s/ cotas e/ou debêntures
+35 - Taxa de Serviço
+36 - Pagamento de cheque para não correntista
+37 - Pagamento de juros e/ou amortização de títulos depositados em garantia nas Câmaras
+38 - Estorno ou Restituição - Diversos
+39 - Pagamento de Vale Transporte
+4 - Pagamento de Salários
+40 - Simples Nacional
+41 - Repasse de valores para o FUNDEB
+42 - Repasse de Valores de Convênio Centralizado
+43 - Patrocínio com Incentivo Fiscal
+44 - Doação com Incentivo Fiscal
+45 - Transferência de conta corrente de instituição não bancária para sua Conta de Liquidação
+47 - Pagamento de Rescisão de Contrato de Trabalho
+5 - Pagamento de Fornecedores
+50 - Reembolso de despesas com estruturação de operações de renda fixa e variável
+500 - Restituição de Prêmios de Seguros
+501 - Pagamento de Indenização de Sinistro de Seguro
+502 - Pagamento de Prêmio de Co-Seguro
+504 - Pagamento de Indenização de Sinistro de Co-Seguro
+505 - Pagamento de Prêmio de Resseguro
+507 - Pagamento de Indenização de Sinistro de Resseguro
+508 - Restituição de Indenização de Sinistro de Resseguro
+509 - Pagamento de Despesas com Sinistros
+510 - Pagamento de Inspeções/Vistorias Prévias
+511 - Pagamento de Resgate de Título da Capitalização
+512 - Pagamento de Sorteio de Título de Capitalização
+513 - Pagamento de Devolução de Mensalidade de Título de Capitalização
+514 - Restituição de Contribuição de Plano Previdenciário
+515 - Pagamento de Benefício Previdenciário de Pecúlio
+516 - Pagamento de Benefício Previdenciário de Pensão
+517 - Pagamento de Benefício Previdenciário de Aposentadoria
+518 - Pagamento de Resgate Previdenciário
+519 - Pagamento de Comissão de Corretagem
+520 - Pagamento de Transferências/Portabilidade de Reserva de Seguro/Previdência
+6 - Pagamento de Honorários
+7 - Pagamento de Aluguéis e Taxas de Condomínio
+8 - Pagamento de Duplicatas e Títulos
+9 - Pagamento de Mensalidade Escolar
+97 - Compra de Moeda Estrangeira pelo FSB - Fundo Soberano do Brasil
+99999 - Outros
