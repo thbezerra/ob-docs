@@ -8,7 +8,7 @@
 - [Pagamento](#pagamento)
   - [Criar pagamento](#criar-pagamento)
 - [Regras de negócio](#regras-de-negcio)
-
+- [Documentação da api e swagger](#documentação-da-api-e-swagger)
 
 # Introdução
    Esta proposta visa adicionar suporte a iniciação de pagamentos através do arranjo de **TED (Transferência Eletrônica Disponível) e TEF (Transferência Eletrônica de Fundos)**.  
@@ -279,3 +279,39 @@ Nesta sessão serão listadas todas as regras de negócio envolvidas nos endpoin
 |**RN304**|A detentora de conta deve validar se o consentimento para pagamento de TED ou TEF está com o valor dentro dos limites de transferência por ela estabelecidos|[Criar consentimento](#criar-consentimento)|422|**VALOR_ACIMA_LIMITE**|Consentimento inválido|O valor (ou quantidade de transações) ultrapassa a faixa de limite parametrizada na detentora para permitir a realização de transações pelo cliente.|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
 |**RN305**|O campo **data.creditorAccount.issuer** só é suportado pelos tipos de conta **CACC**, **SVGS** e **SLRY** e portanto obrigatório apenas nestes casos.|[Criar pagamento](#criar-pagamento)|422|**AGENCIA_REQUERIDA**|Pagamento inválido|O tipo de conta alvo requer as informações de agência|**422ResponseErrorCreateTedTefPayment**|
 |**RN306**|O campo **data.purpose** é obrigatório quando o tipo de pagamento for do arranjo TED|[Criar pagamento](#criar-pagamento)|422|**FINALIDADE_REQUERIDA**|Pagamento inválido|Finalidade é requerida para o pagamento no arranjo alvo|**422ResponseErrorCreateTedTefPayment**|
+
+# Documentação da api e swagger
+
+Nesta sessão é destinada a apontamentos para melhorias da documentação das apis, links com informações úteis e quaisquer informações que possam auxiliar neste contexto.  
+
+- **Herança e polimorfismo**: As alterações propostas neste documento fazem uso desta técnica documentada no Open API [aqui](https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/) .
+- **Descrição de enumerados**: As apis do Open Banking fazem uso muitas vezes de dados com domínios discretos expressados em forma de enumerados. Para facilitar a leitura destes tipos de dados onde a uma descrição semântica de cada valor pertencente ao enumerado recomendamos usar a abordagem abaixo.
+  - Exemplo
+  ```
+              properties:
+              code:
+                type: string
+                maxLength: 21
+                enum:
+                  - FORMA_PGTO_INVALIDA
+                  - DATA_PGTO_INVALIDA
+                  - DETALHE_PGTO_INVALIDO
+                  - NAO_INFORMADO
+                  - INVALID_SCHEDULE
+                example: FORMA_PGTO_INVALIDA
+                description: >
+                  Códigos de erros previstos na criação de consentimento para a iniciação de pagamentos: 
+                  
+                  * `FORMA_PGTO_INVALIDA`- Forma de pagamento inválida.
+                  
+                  * `DATA_PGTO_INVALIDA` - Data de pagamento inválida.
+                  
+                  * `DETALHE_PGTO_INVALIDO` - Detalhe do pagamento inválido.
+                  
+                  * `NAO_INFORMADO` - Não informado.
+                  
+                  * `AGENDAMENTO_INVALIDO` - Agendamento inválido.
+                  
+  ```
+  - **Resultado da renderização no swagger editor** :
+  ![Renderização dos enums](renderizacao-enum.png)
