@@ -1,0 +1,8 @@
+PAYMENT_LIMIT_EXCEEDED - Indica que o pagamento foi rejeitado por ter um valor maior ou quantidade pagamentos supere o limite pré-estabelecido pela detentora de conta. 
+CONSENT_DATA_MISMATCH - Indica que o pagamento foi rejeitado devido aos incompatibilidade com os dados do consentimento associado
+CONSENT_STATUS_NOT_ALLOWED - Indica que o pagamento foi rejeitado devido ao consentimento vinculado não estar em estado esperado pelo fluxo de pagamento.
+INSUFFICIENT_FUNDS - Indica que o pagamento foi rejeitado por insuficiência de fundos na conta do pagador.
+PAYMENT_OUTSIDE_ALLOWED_TIMETABLE - Indica que o pagamento foi rejeitado devido ao fato da janela de horário de pagamentos permitida do arranjo enccerrou.
+CONSENT_REVOKED - Indica que o pagamento agendado foi rejeitado devido a revogação do consentimento vinculado
+UNEXPECTED_SETTLEMENT_ERROR - Indica que ocorreu um problema inesperado na liquidação do pagamento junto ao arranjo alvo
+ 

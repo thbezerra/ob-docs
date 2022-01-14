@@ -206,6 +206,59 @@ As alterações na requisição de criação do consentimento devem refletir tam
 - **Respostas** :
   - **HTTP 200**: Pagamento de TED/TEF criado com sucesso. 
   - **Payload**:  
+  ```
+  {
+   "data":{
+      "paymentId":"TXpRMU9UQTROMWhZV2xSU1FUazJSMDl",
+      "consentId":"urn:bancoex:C1DD33123",
+      "creationDateTime":"2020-07-21T08:30:00Z",
+      "statusUpdateDateTime":"2020-07-21T08:30:00Z",
+      "status":"RJCT",
+      "payment":{
+         "amount":"100000.12",
+         "currency":"BRL"
+      },
+      "creditorAccount":{
+         "ispb":"12345678",
+         "issuer":"1774",
+         "number":"1234567890",
+         "accountType":"CACC"
+      },
+      "purpose":99999,
+      "purposeAdditionalInfo":"Informações adicionais",
+      "rejectionReason":"UNEXPECTED_SETTLEMENT_ERROR"
+   },
+   "links":{
+      "self":"https://api.banco.com.br/open-banking/api/v1/resource"
+   },
+   "meta":{
+      "totalRecords":1,
+      "totalPages":1,
+      "requestDateTime":"2021-05-21T08:30:00Z"
+   }
+  }
+  ```
+ **Campos** :
+
+  |**Campo**|**Tipo**|**Requerido**|**Descrição**|**Regras de negócio**|
+    |----------|------|---------|---------------------------------------------------------------------------------------------------------------|---------|
+  |**data.paymentId**|string|sim|Código ou identificador único informado pela instituição detentora da conta para representar a iniciação de pagamento individual.|N/A|
+  |**data.consentId**|string|sim|Identificador único do consentimento criado para a iniciação de pagamento solicitada. Deverá ser um URN - Uniform Resource Name. Um URN, conforme definido na RFC8141 é um Uniform Resource Identifier - URI - que é atribuído sob o URI scheme "urn" e um namespace URN específico, com a intenção de que o URN seja um identificador de recurso persistente e independente da localização. Considerando a string urn:bancoex:C1DD33123 como exemplo para consentId temos: - o namespace(urn), o identificador associado ao namespace da instituição transnmissora (bancoex), o identificador específico dentro do namespace (C1DD33123).Informações mais detalhadas sobre a construção de namespaces devem ser consultadas na RFC8141.|N/A|
+  |**data.creationDateTime**|string(date-time)|sim|Data e hora em que o recurso foi criado. Uma string com data e hora conforme especificação RFC-3339, sempre com a utilização de timezone UTC(UTC time format).|N/A|
+  |**data.statusUpdateDateTime**|string(date-time)|sim|Data e hora da última atualização da iniciação de pagamento. Uma string com data e hora conforme especificação RFC-3339, sempre com a utilização de timezone UTC(UTC time format).|N/A|
+  |**data.status**|enumerado(string) - 	[EnumPaymentStatusType](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_EnumPaymentStatusType)|sim|Estado atual da iniciação de pagamento. O estado evolui na seguinte ordem: 1. **PDNG** (PENDING) - Iniciação de pagamento ou transação de pagamento está pendente. Checagens adicionais em realização. ; 2. **SASP** (SCHEDULE_ACCEPTED_SETTLEMENT_IN_PROCESS) - Indica que o processo de agendamento está em processamento. ; 3. **SASC** (SCHEDULE_ACCEPTED_SETTLEMENT_COMPLETED) - Indica que o processo de agendamento foi realizado. ; 4. **PART** (PARTIALLY ACCEPTED) - Aguardando autorização múltipla alçada. ; 5. **ACSP** (ACCEPTED_SETTLEMENT_IN_PROCESS) - Iniciação de pagamento aceita e processamento do pagamento foi iniciado. ; 6. **ACSC** (ACCEPTED_SETTLEMENT_COMPLETED_DEBITOR_ACCOUNT) - Débito realizado na conta do pagador. ; 7. **ACCC** (ACCEPTED_SETTLEMENT_COMPLETED) - Crédito realizado na instituição de destino. ; Em caso insucesso: **RJCT** (REJECTED) - Instrução de pagamento rejeitada.|N/A|
+  |**data.payment**|objeto - Payment|sim|Representa os dados financeiros do pagamento.|N/A|
+  |**data.payment.amount**|string|sim|Valor da transação com 2 casas decimais.|N/A| 
+  |**data.payment.currency**|string|sim|Código da moeda nacional segundo modelo ISO-4217, ou seja, 'BRL'. Todos os valores monetários informados estão representados com a moeda vigente do Brasil.|N/A| 
+  |**data.creditorAccount**|objeto - TedTefCreditorAccount|sim|Representa a conta do recebedor da transferência financeira gerada pelo pagamento|N/A|
+  |**data.creditorAccount.ispb**|string|sim|Representa o ISPB (Identificador do Sistema de Pagamentos Brasileiros) da instituição onde a conta do recebedor é domiciliada|N/A|
+  |**data.creditorAccount.issuer**|string|condicionalmente|Código da Agência emissora da conta sem dígito. (Agência é a dependência destinada ao atendimento aos clientes, ao público em geral e aos associados de cooperativas de crédito, no exercício de atividades da instituição, não podendo ser móvel ou transitória). |[RN305](#regras-de-validação)|
+  |**data.creditorAccount.number**|string|sim|Deve ser preenchido com o número da conta do usuário recebedor, com dígito verificador (se este existir), se houver valor alfanumérico, este deve ser convertido para 0.|N/A|
+  |**data.creditorAccount.accountType**|enumerado(string)|sim|Descreve o tipo da conta que receberá o recursos provenientes da iniciação de pagamentos. Domínio: CACC - Current - Conta Corrente, SLRY - Salary - Conta-Salário, SVGS - Savings - Conta de Poupança, TRAN - TransactingAccount - Conta de Pagamento pré-paga.|N/A|
+  |**data.purpose**|enumerado(string) - EnumPurposeTed|condicionalmente|Define a finalidade da transferência. O domínio deste enumerado está no [anexo](lista-de-finalidades.txt)|[RN306](#regras-de-validação)|
+  |**data.purposeAdditionalInfo**|string - max length : 200|condicionalmente|Define o complemento da finalidade da transferência de forma textual.|[RN301](#regras-de-validação)|
+  |**data.rejectionReason**|enumerado(string) - EnumTedTefRejectionReasonType|condicionalmente| Define o motivo pelo qual o pagamento foi rejeitado. Valores possíveis: [anexo](ted-tef-reject-reason.txt) |[RN306](#regras-de-validação)|
+
 
 # Regras de negócio
 
