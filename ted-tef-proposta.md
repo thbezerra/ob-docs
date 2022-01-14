@@ -5,6 +5,8 @@
     - [Estruturação do payload de requisição](#estruturação-do-payload-de-requisição)
   - [Ciclo de vida](#ciclo-de-vida-do-consentimento)
   - [Agendamento](#agendamento)
+- [Pagamento](#pagamento)
+  - [Criar pagamento](#criar-pagamento)
 - [Regras de negócio](#regras-de-negcio)
 
 
@@ -105,7 +107,7 @@ Também serão descritos os campos novos, ou seja, introduzidos pelos novos arra
 
 |**Campo**|**Tipo**|**Requerido**|**Descrição**|Regras de negócio|
 |----------|------|---------|--------------------------------------------------------|---------|
-|**data.payment.purpose**|enum|sim|Define a finalidade da transferência. O domínio deste enumerado está no [anexo](lista-de-finalidades.txt)|N/A|
+|**data.payment.purpose**|enumerado(string) - EnumPurposeTed|sim|Define a finalidade da transferência. O domínio deste enumerado está no [anexo](lista-de-finalidades.txt)|N/A|
 |**data.payment.purposeAdditionalInfo**|string|condicionalmente|Define o complemento da finalidade da transferência de forma textual.|[RN301](#regras-de-validação)|
 
 
@@ -153,7 +155,57 @@ As alterações na requisição de criação do consentimento devem refletir tam
    Ele pode tanto ter uma liquidação imediata quanto pode ser postergada para um momento no futuro definido pelo cliente.  
    Para dar suporte aos novos arranjos de TED/TEF será necessário a criação de novos endpoints REST que viabilizarão o fluxo de pagamento a partir das iniciadoras de pagamentos se forma análoga ao que hoje já praticado no PIX.  
 
+## Criar Pagamento
+- **Path** : POST - /payments/v1/ted-tef/payments
+- **Parâmetros** : 
 
+  |Nome|Origem|Tipo|Requerido|Descrição|
+  |-----------------|----------|------------|---------|---------------------------------------------------------------------------------------------------------------------------|
+  |**Authorization**|header|string|sim|Cabeçalho HTTP padrão. Permite que as credenciais sejam fornecidas dependendo do tipo de recurso solicitado.|
+  |**x-fapi-auth-date**|header|string|não|Data em que o usuário logou pela última vez com o receptor. Representada de acordo com a RFC7231.Exemplo: Sun, 10 Sep 2017 19:43:31 UTC|
+  |**x-fapi-customer-ip-address**|header|string|não|O endereço IP do usuário se estiver atualmente logado com o receptor.|
+  |**x-fapi-interaction-id**|header|string|não|Um UID RFC4122 usado como um ID de correlação. Se fornecido, o transmissor deve "reproduzir" esse valor no cabeçalho de resposta.|
+  |**x-idempotency-key**|header|string|sim|Cabeçalho HTTP personalizado. Identificador de solicitação exclusivo para suportar a idempotência.|
+  |**x-customer-user-agent**|header|string|não|Indica o user-agent que o usuário utiliza.|
+  |**body**|body|objeto|sim|Dados para a criação do pagamento de TED ou TEF.|
+
+- **Payload** : 
+  ```
+  {
+   "data":{
+      "payment":{
+         "amount":"100000.12",
+         "currency":"BRL"
+      },
+      "creditorAccount":{
+         "ispb":"12345678",
+         "issuer":"1774",
+         "number":"1234567890",
+         "accountType":"CACC"
+      },
+      "purpose":1,
+      "purposeAdditionalInfo":"Informações adicionais"
+   }
+  }
+  ```
+- **Campos** :
+
+  |**Campo**|**Tipo**|**Requerido**|**Descrição**|**Regras de negócio**|
+  |----------|------|---------|---------------------------------------------------------------------------------------------------------------|---------|
+  |**data.payment**|objeto - Payment|sim|Representa os dados financeiros do pagamento.|N/A|
+  |**data.payment.amount**|string|sim|Valor da transação com 2 casas decimais.|N/A| 
+  |**data.payment.currency**|string|sim|Código da moeda nacional segundo modelo ISO-4217, ou seja, 'BRL'. Todos os valores monetários informados estão representados com a moeda vigente do Brasil.|N/A| 
+  |**data.creditorAccount**|objeto - TedTefCreditorAccount|sim|Representa a conta do recebedor da transferência financeira gerada pelo pagamento|N/A|
+  |**data.creditorAccount.ispb**|string|sim|Representa o ISPB (Identificador do Sistema de Pagamentos Brasileiros) da instituição onde a conta do recebedor é domiciliada|N/A|
+  |**data.creditorAccount.issuer**|string|condicionalmente|Código da Agência emissora da conta sem dígito. (Agência é a dependência destinada ao atendimento aos clientes, ao público em geral e aos associados de cooperativas de crédito, no exercício de atividades da instituição, não podendo ser móvel ou transitória). |[RN305](#regras-de-validação)|
+  |**data.creditorAccount.number**|string|sim|Deve ser preenchido com o número da conta do usuário recebedor, com dígito verificador (se este existir), se houver valor alfanumérico, este deve ser convertido para 0.|N/A|
+  |**data.creditorAccount.accountType**|enumerado(string)|sim|Descreve o tipo da conta que receberá o recursos provenientes da iniciação de pagamentos. Domínio: CACC - Current - Conta Corrente, SLRY - Salary - Conta-Salário, SVGS - Savings - Conta de Poupança, TRAN - TransactingAccount - Conta de Pagamento pré-paga.|N/A|
+  |**data.purpose**|enumerado(string) - EnumPurposeTed|condicionalmente|Define a finalidade da transferência. O domínio deste enumerado está no [anexo](lista-de-finalidades.txt)|[RN306](#regras-de-validação)|
+  |**data.purposeAdditionalInfo**|string - max length : 200|condicionalmente|Define o complemento da finalidade da transferência de forma textual.|[RN301](#regras-de-validação)|
+
+- **Respostas** :
+  - **HTTP 200**: Pagamento de TED/TEF criado com sucesso. 
+  - **Payload**:  
 
 # Regras de negócio
 
@@ -171,4 +223,6 @@ Nesta sessão serão listadas todas as regras de negócio envolvidas nos endpoin
 |**RN301**|O campo **data.payment.purposeAdditionalInfo** deverá ser preenchido apenas quando a **data.payment.purpose** tiver o valor 99999 - Outros|[Criar consentimento](#criar-consentimento)|422|**DETALHE_PGTO_INVALIDO**|Consentimento inválido|Complemento de finalidade requerida|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
 |**RN302**|O campo **data.payment.creditorAccount.accountType**  quando o arranjo alvo for TED só suportará os tipos **CACC** (Conta corrente), **SVGS** (Poupança) e **TRAN** (Conta de Pagamento pré-paga) |[Criar consentimento](#criar-consentimento)|422|**TIPO_CONTA_NAO_SUPORTADO**|Consentimento inválido|Tipo de conta não suportado pelo arranjo alvo|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
 |**RN303**|A detentora de conta deve validar se o consentimento para pagamento de TED está dentro de sua grade funcionamento para o arranjo|[Criar consentimento](#criar-consentimento)|422|**JANELA_HORARIO_NAO_PERMITIDA**|Consentimento inválido|Janela de horário do arranjo de pagamento alvo não permitida|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
-|**RN304**|A detentora de conta deve validar se o consentimento para pagamento de TED ou TEF está com o valor dentro dos limites de transferência por ela estabelecidos|[Criar consentimento](#criar-consentimento)|422|**VALOR_LIMITE_ATINGINDO**|Consentimento inválido|Valor limite de transferência do usuário no arranjo alvo atingido|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
+|**RN304**|A detentora de conta deve validar se o consentimento para pagamento de TED ou TEF está com o valor dentro dos limites de transferência por ela estabelecidos|[Criar consentimento](#criar-consentimento)|422|**VALOR_ACIMA_LIMITE**|Consentimento inválido|O valor (ou quantidade de transações) ultrapassa a faixa de limite parametrizada na detentora para permitir a realização de transações pelo cliente.|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
+|**RN305**|O campo **data.creditorAccount.issuer** só é suportado pelos tipos de conta **CACC**, **SVGS** e **SLRY** e portanto obrigatório apenas nestes casos.|[Criar pagamento](#criar-pagamento)|422|**AGENCIA_REQUERIDA**|Pagamento inválido|O tipo de conta alvo requer as informações de agência|**422ResponseErrorCreateTedTefPayment**|
+|**RN306**|O campo **data.purpose** é obrigatório quando o tipo de pagamento for do arranjo TED|[Criar pagamento](#criar-pagamento)|422|**FINALIDADE_REQUERIDA**|Pagamento inválido|Finalidade é requerida para o pagamento no arranjo alvo|**422ResponseErrorCreateTedTefPayment**|
