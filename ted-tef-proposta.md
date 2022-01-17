@@ -137,13 +137,14 @@ Também serão descritos os campos novos, ou seja, introduzidos pelos novos arra
 }
 ```
 **Campos novos ou alterados do payload para TEF**
+
 |**Campo**|**Tipo**|**Requerido**|**Descrição**|Regras de negócio|
 |----------|------|---------|--------------------------------------------------------|---------|
-|**data.payment.proxy**|(string)|nao|Alias utilizado pela instituição para identificar a conta de destino do transferencia.|
-|**data.payment.creditorAccount**|Object|nao|Conta do destinatario do TEF|
+|**data.payment.proxy**|string|condicionalmente|Alias utilizado pela instituição para identificar a conta de destino do transferência. Mutuamente exclusivo com o campo data.payment.creditorAccount|[RN307](#regras-de-validação)|
+|**data.payment.creditorAccount**|Object|condicionalmente|Conta do destinatário do TEF. Mutuamente exclusivo com o campo data.payment.proxy|[RN307](#regras-de-validação)|
 
 A iniciação de pagamento para TEF permite que a iniciadora informe a conta de destino diretamente ou o proxy (identificador da conta na instituição ) no momento da iniciação.
-Caso a detentora de conta identifique a conta informada pelo Alias e a jornada de consentimento se contretis a detentora deverá retonar no payload de response o objeto creditorAccount com a informação da conta associada ao proxy informado.
+Caso a detentora de conta identifique a conta informada pelo Alias e a jornada de consentimento se concretiza, a detentora deverá retonar no payload de response o objeto creditorAccount com a informação da conta associada ao proxy informado.
 Importante atentar que a iniciadora deverá utilizar o creditorAccount retornado para prosseguir com a transação.
 
 
@@ -293,6 +294,8 @@ Nesta sessão serão listadas todas as regras de negócio envolvidas nos endpoin
 |**RN304**|A detentora de conta deve validar se o consentimento para pagamento de TED ou TEF está com o valor dentro dos limites de transferência por ela estabelecidos|[Criar consentimento](#criar-consentimento)|422|**VALOR_ACIMA_LIMITE**|Consentimento inválido|O valor (ou quantidade de transações) ultrapassa a faixa de limite parametrizada na detentora para permitir a realização de transações pelo cliente.|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
 |**RN305**|O campo **data.creditorAccount.issuer** só é suportado pelos tipos de conta **CACC**, **SVGS** e **SLRY** e portanto obrigatório apenas nestes casos.|[Criar pagamento](#criar-pagamento)|422|**AGENCIA_REQUERIDA**|Pagamento inválido|O tipo de conta alvo requer as informações de agência|**422ResponseErrorCreateTedTefPayment**|
 |**RN306**|O campo **data.purpose** é obrigatório quando o tipo de pagamento for do arranjo TED|[Criar pagamento](#criar-pagamento)|422|**FINALIDADE_REQUERIDA**|Pagamento inválido|Finalidade é requerida para o pagamento no arranjo alvo|**422ResponseErrorCreateTedTefPayment**|
+|**RN307**|O campo **data.payment.proxy** e **data.payment.creditorAccount** para o contexto de TEF são mutuamente exclusivos entre si.|[Criar pagamento](#criar-pagamento)|422|**DETALHE_PGTO_INVALIDO**|Consentimento inválido|O campo proxy ou creditorAccount devem ser informados|[422ResponseErrorCreateConsent](https://openbanking-brasil.github.io/areadesenvolvedor/#tocS_422ResponseErrorCreateConsent)|
+
 
 # Documentação da api e swagger
 
