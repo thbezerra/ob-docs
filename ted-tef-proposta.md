@@ -125,7 +125,6 @@ Também serão descritos os campos novos, ou seja, introduzidos pelos novos arra
          },
          "currency":"BRL",
          "amount":"100000.12",
-         "proxy":"xpot@xpot.com.br",
          "creditorAccount":{
             "ispb":"12345678",
             "issuer":"1774",
