@@ -1,0 +1,7 @@
+VALOR_ACIMA_LIMITE - Indica que o pagamento foi rejeitado por ter um valor maior ou quantidade pagamentos supere o limite pré-estabelecido pela detentora de conta. 
+PAGAMENTO_DIVERGENTE_DO_CONSENTIMENTO - Indica que o pagamento foi rejeitado devido aos incompatibilidade com os dados do consentimento associado
+CONSENTIMENTO_INVALIDO - Indica que o pagamento foi rejeitado devido ao consentimento vinculado não estar em um estado esperado pelo fluxo de pagamento.
+SALDO_INSUFICIENTE - Indica que o pagamento foi rejeitado por insuficiência de fundos na conta do pagador.
+JANELA_OPER_INVALIDA - Indica que o pagamento foi rejeitado devido ao fato da janela de horário de pagamentos permitida do arranjo enccerrou.
+LIQUIDACAO_ERRO_INESPERADO - Indica que ocorreu um problema inesperado na liquidação do pagamento junto ao arranjo alvo
+NAO_INFORMADO - Indica que o pagamento foi rejeitado por uma situação não informada pela detentora

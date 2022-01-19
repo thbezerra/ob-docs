@@ -1,0 +1,7 @@
+Code: VALOR_ACIMA_LIMITE , Descrição:  Acima do limite estabelecido 
+Code: PAGAMENTO_DIVERGENTE_DO_CONSENTIMENTO, Descrição: Dados do pagamento divergentes dos dados do consentimento.
+Code: CONSENTIMENTO_INVALIDO, Descrição:  Consentimento inválido (status diferente de "AUTHORISED" ou está expirado)
+Code: SALDO_INSUFICIENTE, Descrição: A conta selecionada não possui saldo suficiente para realizar o pagamento
+Code: JANELA_OPER_INVALIDA, Descrição: Requisição está fora da janela de funcionamento.
+Code: LIQUIDACAO_ERRO_INESPERADO, Descrição: Erro na liquidação do pagamento no arranjo alvo.
+Code: NAO_INFORMADO, Descrição:  Não reportado/identificado pela instituição detentora de conta.

@@ -1,0 +1,7 @@
+Code: VALOR_ACIMA_LIMITE , Título:  Acima do limite estabelecido 
+Code: PAGAMENTO_DIVERGENTE_DO_CONSENTIMENTO, Título: Divergência entre pagamento e consentimento 
+Code: CONSENTIMENTO_INVALIDO, Título: Consentimento inválido
+Code: SALDO_INSUFICIENTE, Título: Saldo insuficiente
+Code: JANELA_OPER_INVALIDA, Título: Janela de operação inválida
+Code: LIQUIDACAO_ERRO_INESPERADO, Título: Erro na liquidação do pagamento no arranjo
+Code: NAO_INFORMADO, Título: Não informado

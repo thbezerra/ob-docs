@@ -267,6 +267,35 @@ As alterações na requisição de criação do consentimento devem refletir tam
   |**data.purposeAdditionalInfo**|string - max length : 200|condicionalmente|Define o complemento da finalidade da transferência de forma textual.|[RN301](#regras-de-validação)|
   |**data.rejectionReason**|enumerado(string) - EnumTedTefRejectionReasonType|condicionalmente| Define o motivo pelo qual o pagamento foi rejeitado. Valores possíveis: [anexo](ted-tef-reject-reason.txt) |[RN306](#regras-de-validação)|
 
+- **HTTP 422**: Violação de alguma regra de negócio no pagamento de TED/TEF.
+- **Schema**: 422ResponseErrorCreateTedTefPayment
+- **Payload**:
+```
+{
+   "errors":[
+      {
+         "code":"SALDO_INSUFICIENTE",
+         "title":"Saldo insuficiente",
+         "detail":"Esta conta não possui saldo suficiente para realizar o pagamento"
+      }
+   ],
+   "meta":{
+      "totalRecords":1,
+      "totalPages":1,
+      "requestDateTime":"2021-05-21T08:30:00Z"
+   }
+}
+```
+
+**Campos** :
+
+|**Campo**|**Tipo**|**Requerido**|**Descrição**|**Regras de negócio**|
+|----------|------|---------|---------------------------------------------------------------------------------------------------------------|---------|
+|**errors**|array|sim|Contém as violações de negócio na tentativa de criação do pagamento de TED ou TEF .|N/A|
+|**errors[n].code**|enumerado - **EnumErrorsCreateTedTefPayment**|sim|Código de erro que representa uma violação de regra de negócio.Domínio em [anexo](422-codes-ted-tef.txt)|N/A|
+|**errors[n].title**|string|sim|Título específico do erro reportado, de acordo com o código enviado. Correlação em [anexo](422-titulos-ted-tef.txt)|N/A|
+|**errors[n].detail**|string|sim|Descrição específica do erro de acordo com o código reportado. Correlação em [anexo](422-descricoes-ted-tef.txt)|N/A|
+|**meta**|object - [Meta](https://sensedia.github.io/areadesenvolvedor/#tocS_Meta)|não|Meta informações referente à API requisitada.|N/A|
 
 # Regras de negócio
 
