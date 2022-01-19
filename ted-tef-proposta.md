@@ -264,7 +264,7 @@ As alterações na requisição de criação do consentimento devem refletir tam
   |**data.creditorAccount.number**|string|sim|Deve ser preenchido com o número da conta do usuário recebedor, com dígito verificador (se este existir), se houver valor alfanumérico, este deve ser convertido para 0.|N/A|
   |**data.creditorAccount.accountType**|enumerado(string)|sim|Descreve o tipo da conta que receberá o recursos provenientes da iniciação de pagamentos. Domínio: CACC - Current - Conta Corrente, SLRY - Salary - Conta-Salário, SVGS - Savings - Conta de Poupança, TRAN - TransactingAccount - Conta de Pagamento pré-paga.|N/A|
   |**data.purpose**|enumerado(string) - EnumPurposeTed|condicionalmente|Define a finalidade da transferência. O domínio deste enumerado está no [anexo](lista-de-finalidades.txt)|[RN306](#regras-de-validação)|
-  |**data.purposeAdditionalInfo**|string - max length : 200|condicionalmente|Define o complemento da finalidade da transferência de forma textual.|[RN301](#regras-de-validação)|
+  |**data.purposeAdditionalInfo**|string (alfanumerico) - max length : 200, pattern: ^[a-zA-Z0-9_\s]*$ |condicionalmente|Define o complemento da finalidade da transferência de forma textual.|[RN301](#regras-de-validação)|
   |**data.rejectionReason**|enumerado(string) - EnumTedTefRejectionReasonType|condicionalmente| Define o motivo pelo qual o pagamento foi rejeitado. Valores possíveis: [anexo](ted-tef-reject-reason.txt) |[RN306](#regras-de-validação)|
 
 - **HTTP 422**: Violação de alguma regra de negócio no pagamento de TED/TEF.
