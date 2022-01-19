@@ -5,4 +5,4 @@ INSUFFICIENT_FUNDS - Indica que o pagamento foi rejeitado por insuficiência de 
 PAYMENT_OUTSIDE_ALLOWED_TIMETABLE - Indica que o pagamento foi rejeitado devido ao fato da janela de horário de pagamentos permitida do arranjo enccerrou.
 CONSENT_REVOKED - Indica que o pagamento agendado foi rejeitado devido a revogação do consentimento vinculado
 UNEXPECTED_SETTLEMENT_ERROR - Indica que ocorreu um problema inesperado na liquidação do pagamento junto ao arranjo alvo
- 
+UNEXPECTED_ERROR - Indica que o pagamento foi rejeitado por uma situação não informada pela detentora
