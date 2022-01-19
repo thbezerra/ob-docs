@@ -140,13 +140,7 @@ Também serão descritos os campos novos, ou seja, introduzidos pelos novos arra
 
 |**Campo**|**Tipo**|**Requerido**|**Descrição**|Regras de negócio|
 |----------|------|---------|--------------------------------------------------------|---------|
-|**data.payment.proxy**|string|condicionalmente|Alias utilizado pela instituição para identificar a conta de destino do transferência. Mutuamente exclusivo com o campo data.payment.creditorAccount|[RN307](#regras-de-validação), [RN308](#regras-de-validação), [RN309](#regras-de-validação)|
-|**data.payment.creditorAccount**|Object|condicionalmente|Conta do destinatário do TEF. Mutuamente exclusivo com o campo data.payment.proxy|[RN307](#regras-de-validação)|
-
-A iniciação de pagamento para TEF permite que a iniciadora informe a conta de destino diretamente ou o proxy (identificador da conta na instituição ) no momento da iniciação.
-Caso a detentora de conta identifique a conta informada pelo Alias e a jornada de consentimento se concretiza, a detentora deverá retonar no payload de response o objeto creditorAccount com a informação da conta associada ao proxy informado.
-Importante atentar que a iniciadora deverá utilizar o creditorAccount retornado para prosseguir com a transação.
-
+|**data.payment.creditorAccount**|Object|sim|Conta do destinatário do TEF.|N/A|
 
 A iniciação de pagamentos para TED não suporta todos os tipos de contas de crédito disponíveis pelo Open Banking, sendo suportado somente conta corrente, poupança e pagamentos ([RN302](#regras-de-validação)).  
 
